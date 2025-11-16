@@ -1,3 +1,4 @@
-mod implement;
+#[cfg(feature = "lock")]
 pub mod lock;
 
+mod implement;
