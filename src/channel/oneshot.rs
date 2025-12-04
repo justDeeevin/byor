@@ -39,3 +39,8 @@ pub trait Receiver<T>: Future<Output = Result<T, Self::RecvError>> {
     /// `Err` if the channel is closed.
     fn try_recv(&mut self) -> Result<Option<T>, Self::TryRecvError>;
 }
+
+pub trait RuntimeOneshot {
+    type OneshotSender<T>: Sender<T>;
+    type OneshotReceiver<T>: Receiver<T>;
+}

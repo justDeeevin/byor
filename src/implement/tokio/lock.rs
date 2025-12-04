@@ -1,4 +1,4 @@
-use crate::lock::*;
+use crate::{lock::*, runtime::Tokio};
 
 impl Barrier for tokio::sync::Barrier {
     fn new(n: usize) -> Self {
@@ -150,4 +150,14 @@ impl SemaphorePermit for tokio::sync::SemaphorePermit<'_> {
     fn forget(self) {
         self.forget()
     }
+}
+
+impl RuntimeLock for Tokio {
+    type Mutex<T: ?Sized> = tokio::sync::Mutex<T>;
+}
+
+impl RuntimeLockExt for Tokio {
+    type RwLock<T: ?Sized> = tokio::sync::RwLock<T>;
+    type Barrier = tokio::sync::Barrier;
+    type Semaphore = tokio::sync::Semaphore;
 }

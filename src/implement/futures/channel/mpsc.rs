@@ -1,4 +1,4 @@
-use crate::channel::mpsc::*;
+use crate::{channel::mpsc::*, runtime::Futures};
 
 impl<T> Sender<T> for futures::channel::mpsc::Sender<T> {
     type SendError = futures::channel::mpsc::SendError;
@@ -76,4 +76,12 @@ impl<T> Receiver<T> for futures::channel::mpsc::UnboundedReceiver<T> {
     fn try_recv(&mut self) -> Result<Option<T>, Self::TryRecvError> {
         self.try_next()
     }
+}
+
+impl RuntimeMpsc for Futures {
+    type BoundedSender<T: 'static> = futures::channel::mpsc::Sender<T>;
+    type BoundedReceiver<T> = futures::channel::mpsc::Receiver<T>;
+
+    type UnboundedSender<T: 'static> = futures::channel::mpsc::UnboundedSender<T>;
+    type UnboundedReceiver<T> = futures::channel::mpsc::UnboundedReceiver<T>;
 }

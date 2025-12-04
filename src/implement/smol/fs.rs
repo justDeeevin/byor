@@ -1,7 +1,7 @@
 use crate::fs::*;
 use futures_lite::Stream;
 
-impl Fs for crate::Smol {
+impl Fs for crate::runtime::Smol {
     type File = smol::fs::File;
 
     fn canonocalize(

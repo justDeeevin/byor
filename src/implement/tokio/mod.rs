@@ -9,5 +9,3 @@ mod channel;
 
 #[cfg(feature = "fs")]
 mod fs;
-
-any_feature! { mod runtime; }

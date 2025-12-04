@@ -1,4 +1,4 @@
-use crate::channel::mpsc::*;
+use crate::{channel::mpsc::*, runtime::Smol};
 use smol::channel::{Receiver as SmolReceiver, Sender as SmolSender};
 
 impl<T> Sender<T> for smol::channel::Sender<T> {
@@ -41,4 +41,12 @@ impl<T> UnboundedSender<T> for SmolSender<T> {
     fn send(&self, message: T) -> Result<(), Self::SendError> {
         self.force_send(message).map(|_| ())
     }
+}
+
+impl RuntimeMpsc for Smol {
+    type BoundedSender<T: 'static> = smol::channel::Sender<T>;
+    type BoundedReceiver<T> = smol::channel::Receiver<T>;
+
+    type UnboundedSender<T: 'static> = smol::channel::Sender<T>;
+    type UnboundedReceiver<T> = smol::channel::Receiver<T>;
 }

@@ -1,4 +1,4 @@
-use crate::lock::*;
+use crate::{lock::*, runtime::Smol};
 
 impl Barrier for smol::lock::Barrier {
     fn new(n: usize) -> Self {
@@ -150,4 +150,14 @@ impl SemaphorePermit for smol::lock::SemaphoreGuard<'_> {
     fn forget(self) {
         self.forget()
     }
+}
+
+impl RuntimeLock for Smol {
+    type Mutex<T: ?Sized> = smol::lock::Mutex<T>;
+}
+
+impl RuntimeLockExt for Smol {
+    type RwLock<T: ?Sized> = smol::lock::RwLock<T>;
+    type Barrier = smol::lock::Barrier;
+    type Semaphore = smol::lock::Semaphore;
 }

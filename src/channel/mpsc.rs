@@ -61,3 +61,11 @@ pub trait UnboundedSender<T>: Sender<T> {
     /// Returrns `Err` with the given value if the channel is closed.
     fn send(&self, message: T) -> Result<(), Self::SendError>;
 }
+
+pub trait RuntimeMpsc {
+    type BoundedSender<T: 'static>: BoundedSender<T>;
+    type BoundedReceiver<T>: Receiver<T>;
+
+    type UnboundedSender<T: 'static>: UnboundedSender<T>;
+    type UnboundedReceiver<T>: Receiver<T>;
+}

@@ -1,4 +1,7 @@
-use crate::lock::Mutex;
+use crate::{
+    lock::{Mutex, RuntimeLock},
+    runtime::Futures,
+};
 
 impl<T: ?Sized> Mutex<T> for futures::lock::Mutex<T> {
     type Guard<'a>
@@ -31,4 +34,8 @@ impl<T: ?Sized> Mutex<T> for futures::lock::Mutex<T> {
     {
         self.into_inner()
     }
+}
+
+impl RuntimeLock for Futures {
+    type Mutex<T: ?Sized> = futures::lock::Mutex<T>;
 }

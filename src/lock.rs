@@ -187,3 +187,13 @@ pub trait SemaphorePermit {
     /// Drops the guard _without_ releasing the acquired permit.
     fn forget(self);
 }
+
+pub trait RuntimeLock {
+    type Mutex<T: ?Sized>: Mutex<T> + ?Sized;
+}
+
+pub trait RuntimeLockExt: RuntimeLock {
+    type RwLock<T: ?Sized>: RwLock<T> + ?Sized;
+    type Barrier: Barrier;
+    type Semaphore: Semaphore;
+}

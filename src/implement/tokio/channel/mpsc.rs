@@ -1,4 +1,4 @@
-use crate::channel::mpsc::*;
+use crate::{channel::mpsc::*, runtime::Tokio};
 use tokio::sync::mpsc::{Sender as TokioSender, UnboundedSender as TokioUnboundedSender};
 
 impl<T> Sender<T> for TokioSender<T> {
@@ -85,4 +85,12 @@ impl<T> Receiver<T> for tokio_stream::wrappers::UnboundedReceiverStream<T> {
             Err(Self::TryRecvError::Disconnected) => Err(Self::TryRecvError::Disconnected),
         }
     }
+}
+
+impl RuntimeMpsc for Tokio {
+    type BoundedSender<T: 'static> = tokio::sync::mpsc::Sender<T>;
+    type BoundedReceiver<T> = tokio_stream::wrappers::ReceiverStream<T>;
+
+    type UnboundedSender<T: 'static> = tokio::sync::mpsc::UnboundedSender<T>;
+    type UnboundedReceiver<T> = tokio_stream::wrappers::UnboundedReceiverStream<T>;
 }

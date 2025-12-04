@@ -11,3 +11,6 @@ pub trait Executor {
     ) -> Self::Task<T>;
 }
 
+pub trait RuntimeExecutor {
+    type Executor: Executor;
+}

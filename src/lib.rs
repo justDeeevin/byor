@@ -10,22 +10,7 @@ pub mod executor;
 #[cfg(feature = "fs")]
 pub mod fs;
 
-macro_rules! any_feature {
-  ($($item:tt)*) => {
-    #[cfg(any(feature = "lock", feature = "channel", feature = "exec"))]
-    $($item)*
-  }
-}
-
-any_feature! { pub mod runtime; }
-
-#[cfg(feature = "tokio")]
-pub struct Tokio;
-
-#[cfg(feature = "smol")]
-pub struct Smol;
-
-#[cfg(feature = "futures")]
-pub struct Futures;
+#[cfg(any(feature = "tokio", feature = "smol", feature = "futures"))]
+pub mod runtime;
 
 mod implement;

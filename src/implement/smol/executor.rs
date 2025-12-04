@@ -1,4 +1,4 @@
-use crate::executor::*;
+use crate::{executor::*, runtime::Smol};
 
 impl Executor for smol::Executor<'_> {
     type TaskWrap<T> = T;
@@ -10,4 +10,8 @@ impl Executor for smol::Executor<'_> {
     ) -> Self::Task<T> {
         self.spawn(future)
     }
+}
+
+impl RuntimeExecutor for Smol {
+    type Executor = smol::Executor<'static>;
 }

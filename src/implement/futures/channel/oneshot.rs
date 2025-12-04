@@ -1,6 +1,6 @@
 use std::task::{Context, Poll};
 
-use crate::channel::oneshot::*;
+use crate::{channel::oneshot::*, runtime::Futures};
 
 impl<T> Sender<T> for futures::channel::oneshot::Sender<T> {
     fn send(self, t: T) -> Result<(), T> {
@@ -27,4 +27,9 @@ impl<T> Receiver<T> for futures::channel::oneshot::Receiver<T> {
     fn try_recv(&mut self) -> Result<Option<T>, Self::TryRecvError> {
         self.try_recv()
     }
+}
+
+impl RuntimeOneshot for Futures {
+    type OneshotSender<T> = futures::channel::oneshot::Sender<T>;
+    type OneshotReceiver<T> = futures::channel::oneshot::Receiver<T>;
 }

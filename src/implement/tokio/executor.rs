@@ -1,4 +1,4 @@
-use crate::executor::*;
+use crate::{executor::*, runtime::Tokio};
 
 impl Executor for tokio::runtime::Runtime {
     type TaskWrap<T> = Result<T, tokio::task::JoinError>;
@@ -10,4 +10,8 @@ impl Executor for tokio::runtime::Runtime {
     ) -> Self::Task<T> {
         self.spawn(future)
     }
+}
+
+impl RuntimeExecutor for Tokio {
+    type Executor = tokio::runtime::Runtime;
 }
