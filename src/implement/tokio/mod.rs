@@ -1,3 +1,5 @@
+mod executor;
+
 #[cfg(feature = "lock")]
 mod lock;
 
