@@ -4,4 +4,7 @@ mod lock;
 #[cfg(feature = "channel")]
 mod channel;
 
+#[cfg(feature = "exec")]
 mod executor;
+
+mod runtime;

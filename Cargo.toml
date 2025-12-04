@@ -13,10 +13,11 @@ tokio-stream = { version = "0.1.17", default-features = false, optional = true }
 [features]
 default = ["full"]
 
-smol = ["dep:futures", "dep:smol"]
-tokio = ["dep:futures", "dep:tokio", "tokio/rt-multi-thread"]
-futures-executor = ["dep:futures", "futures/thread-pool"]
+smol = ["dep:smol"]
+tokio = ["dep:tokio", "dep:tokio-stream"]
+futures = ["dep:futures"]
 
-full = ["lock", "channel"]
+full = ["lock", "channel", "exec"]
+exec = ["tokio/rt-multi-thread", "futures/thread-pool"]
 lock = ["tokio/sync", "futures/std"]
-channel = ["tokio/sync", "dep:tokio-stream", "tokio-stream/sync"]
+channel = ["tokio/sync", "tokio-stream/sync"]

@@ -1,3 +1,6 @@
+mod runtime;
+
+#[cfg(feature = "exec")]
 mod executor;
 
 #[cfg(feature = "lock")]

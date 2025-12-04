@@ -4,5 +4,5 @@ mod smol;
 #[cfg(feature = "tokio")]
 mod tokio;
 
-#[cfg(feature = "futures-executor")]
+#[cfg(feature = "futures")]
 mod futures;
