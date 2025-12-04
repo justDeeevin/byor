@@ -62,6 +62,7 @@ pub trait UnboundedSender<T>: Sender<T> {
     fn send(&self, message: T) -> Result<(), Self::SendError>;
 }
 
+/// A runtime with an MPSC channel.
 pub trait RuntimeMpsc {
     type BoundedSender<T: 'static>: BoundedSender<T>;
     type BoundedReceiver<T>: Receiver<T>;

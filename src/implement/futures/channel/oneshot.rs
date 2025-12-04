@@ -1,6 +1,5 @@
-use std::task::{Context, Poll};
-
 use crate::{channel::oneshot::*, runtime::Futures};
+use std::task::{Context, Poll};
 
 impl<T> Sender<T> for futures::channel::oneshot::Sender<T> {
     fn send(self, t: T) -> Result<(), T> {

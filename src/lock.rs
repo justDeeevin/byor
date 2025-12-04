@@ -1,7 +1,15 @@
+//! Async synchronization primitives.
+//!
+//! In general, using [`std::sync`] is preferred over their async counterparts. You should only
+//! reach for these when a lock needs to be held across an await point (clippy will warn you in
+//! this case:
+//! [`Clippy::await_holding_lock`](https://rust-lang.github.io/rust-clippy/stable/index.html#await_holding_lock)).
+
 use std::ops::{Deref, DerefMut};
 
 /// An asynchronous mutex similar to [`std::sync::Mutex`].
 pub trait Mutex<T: ?Sized> {
+    /// An RAII guard that unlocks the mutex when dropped.
     type Guard<'a>
     where
         Self: 'a;
@@ -55,9 +63,11 @@ where
 
 /// An asynchronous reader-writer lock similar to [`std::sync::RwLock`].
 pub trait RwLock<T: ?Sized> {
+    /// A read-only RAII guard that releases its read lock when dropped.
     type ReadGuard<'a>: RwLockReadGuard<T>
     where
         Self: 'a;
+    /// A read-write RAII guard that releases its write lock when dropped.
     type WriteGuard<'a>: RwLockWriteGuard<T>
     where
         Self: 'a;
@@ -153,6 +163,7 @@ pub trait BarrierWaitResult {
 
 /// A counter for limiting the number of concurrent operations.
 pub trait Semaphore {
+    // An RAII guard that releases the permit when dropped.
     type Permit<'a>: SemaphorePermit
     where
         Self: 'a;
@@ -188,10 +199,12 @@ pub trait SemaphorePermit {
     fn forget(self);
 }
 
+/// A runtime with a Mutex implementation.
 pub trait RuntimeLock {
     type Mutex<T: ?Sized>: Mutex<T> + ?Sized;
 }
 
+/// A runtime with more locks.
 pub trait RuntimeLockExt: RuntimeLock {
     type RwLock<T: ?Sized>: RwLock<T> + ?Sized;
     type Barrier: Barrier;

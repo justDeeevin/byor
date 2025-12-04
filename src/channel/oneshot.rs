@@ -1,4 +1,5 @@
 //! A channel used for sending a single message between asynchronous tasks.
+
 use std::task::{Context, Poll};
 
 pub trait Sender<T> {
@@ -40,6 +41,7 @@ pub trait Receiver<T>: Future<Output = Result<T, Self::RecvError>> {
     fn try_recv(&mut self) -> Result<Option<T>, Self::TryRecvError>;
 }
 
+/// A runtime with a oneshot channel.
 pub trait RuntimeOneshot {
     type OneshotSender<T>: Sender<T>;
     type OneshotReceiver<T>: Receiver<T>;

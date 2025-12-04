@@ -1,6 +1,5 @@
-use std::task::{Context, Poll};
-
 use crate::{channel::oneshot::*, runtime::Tokio};
+use std::task::{Context, Poll};
 
 impl<T> Sender<T> for tokio::sync::oneshot::Sender<T> {
     fn send(self, t: T) -> Result<(), T> {
