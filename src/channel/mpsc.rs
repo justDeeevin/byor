@@ -4,6 +4,7 @@ use futures::Stream;
 
 /// Base sender behavior for both unbounded and bounded channels.
 pub trait Sender<T>: Clone {
+    // TODO: this doesn't need to be an associated type
     type SendError: std::error::Error;
 
     /// Returns whether the channel is closed.

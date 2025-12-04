@@ -9,15 +9,24 @@ smol = { version = "2.0.2", optional = true }
 futures = { version = "0.3.31", default-features = false, optional = true }
 thiserror = "2.0.17"
 tokio-stream = { version = "0.1.17", default-features = false, optional = true }
+tokio-util = { version = "0.7.17", default-features = false, optional = true }
+macro_rules_attribute = "0.2.2"
 
 [features]
 default = ["full"]
 
 smol = ["dep:smol"]
-tokio = ["dep:tokio", "dep:tokio-stream"]
+tokio = ["dep:tokio", "dep:tokio-stream", "dep:tokio-util"]
 futures = ["dep:futures"]
 
-full = ["lock", "channel", "exec"]
+full = ["lock", "channel", "exec", "fs"]
 exec = ["tokio/rt-multi-thread", "futures/thread-pool"]
 lock = ["tokio/sync", "futures/std"]
-channel = ["tokio/sync", "tokio-stream/sync"]
+channel = ["dep:futures", "tokio/sync", "tokio-stream/sync"]
+fs = [
+  "dep:futures",
+  "futures/std",
+  "tokio/fs",
+  "tokio-stream/fs",
+  "tokio-util/compat",
+]

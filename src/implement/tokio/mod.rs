@@ -1,5 +1,3 @@
-mod runtime;
-
 #[cfg(feature = "exec")]
 mod executor;
 
@@ -8,3 +6,8 @@ mod lock;
 
 #[cfg(feature = "channel")]
 mod channel;
+
+#[cfg(feature = "fs")]
+mod fs;
+
+any_feature! { mod runtime; }

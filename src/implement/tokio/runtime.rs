@@ -1,4 +1,3 @@
-#[cfg(any(feature = "lock", feature = "channel", feature = "exec"))]
 use crate::runtime::*;
 
 #[cfg(feature = "lock")]

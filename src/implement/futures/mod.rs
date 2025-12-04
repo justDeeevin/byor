@@ -7,4 +7,4 @@ mod channel;
 #[cfg(feature = "exec")]
 mod executor;
 
-mod runtime;
+any_feature! { mod runtime; }
