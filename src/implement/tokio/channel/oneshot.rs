@@ -35,4 +35,8 @@ impl<T> Receiver<T> for tokio::sync::oneshot::Receiver<T> {
 impl RuntimeOneshot for Tokio {
     type OneshotSender<T> = tokio::sync::oneshot::Sender<T>;
     type OneshotReceiver<T> = tokio::sync::oneshot::Receiver<T>;
+
+    fn channel<T>() -> (Self::OneshotSender<T>, Self::OneshotReceiver<T>) {
+        tokio::sync::oneshot::channel()
+    }
 }

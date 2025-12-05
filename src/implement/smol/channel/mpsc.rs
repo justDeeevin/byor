@@ -47,6 +47,16 @@ impl RuntimeMpsc for Smol {
     type BoundedSender<T: 'static> = smol::channel::Sender<T>;
     type BoundedReceiver<T> = smol::channel::Receiver<T>;
 
+    fn bounded_channel<T: 'static>(
+        buffer: usize,
+    ) -> (Self::BoundedSender<T>, Self::BoundedReceiver<T>) {
+        smol::channel::bounded(buffer)
+    }
+
     type UnboundedSender<T: 'static> = smol::channel::Sender<T>;
     type UnboundedReceiver<T> = smol::channel::Receiver<T>;
+
+    fn unbounded_channel<T: 'static>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>) {
+        smol::channel::unbounded()
+    }
 }

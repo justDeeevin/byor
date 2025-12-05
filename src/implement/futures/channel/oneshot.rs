@@ -31,4 +31,8 @@ impl<T> Receiver<T> for futures::channel::oneshot::Receiver<T> {
 impl RuntimeOneshot for Futures {
     type OneshotSender<T> = futures::channel::oneshot::Sender<T>;
     type OneshotReceiver<T> = futures::channel::oneshot::Receiver<T>;
+
+    fn channel<T>() -> (Self::OneshotSender<T>, Self::OneshotReceiver<T>) {
+        futures::channel::oneshot::channel()
+    }
 }

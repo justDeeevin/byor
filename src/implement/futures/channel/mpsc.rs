@@ -82,6 +82,16 @@ impl RuntimeMpsc for Futures {
     type BoundedSender<T: 'static> = futures::channel::mpsc::Sender<T>;
     type BoundedReceiver<T> = futures::channel::mpsc::Receiver<T>;
 
+    fn bounded_channel<T: 'static>(
+        buffer: usize,
+    ) -> (Self::BoundedSender<T>, Self::BoundedReceiver<T>) {
+        futures::channel::mpsc::channel(buffer)
+    }
+
     type UnboundedSender<T: 'static> = futures::channel::mpsc::UnboundedSender<T>;
     type UnboundedReceiver<T> = futures::channel::mpsc::UnboundedReceiver<T>;
+
+    fn unbounded_channel<T: 'static>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>) {
+        futures::channel::mpsc::unbounded()
+    }
 }

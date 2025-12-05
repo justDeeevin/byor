@@ -67,6 +67,12 @@ pub trait RuntimeMpsc {
     type BoundedSender<T: 'static>: BoundedSender<T>;
     type BoundedReceiver<T>: Receiver<T>;
 
+    fn bounded_channel<T: 'static>(
+        buffer: usize,
+    ) -> (Self::BoundedSender<T>, Self::BoundedReceiver<T>);
+
     type UnboundedSender<T: 'static>: UnboundedSender<T>;
     type UnboundedReceiver<T>: Receiver<T>;
+
+    fn unbounded_channel<T: 'static>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>);
 }

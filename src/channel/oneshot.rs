@@ -45,4 +45,6 @@ pub trait Receiver<T>: Future<Output = Result<T, Self::RecvError>> {
 pub trait RuntimeOneshot {
     type OneshotSender<T>: Sender<T>;
     type OneshotReceiver<T>: Receiver<T>;
+
+    fn channel<T>() -> (Self::OneshotSender<T>, Self::OneshotReceiver<T>);
 }
