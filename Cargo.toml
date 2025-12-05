@@ -1,6 +1,6 @@
 [package]
 name = "byor"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 edition = "2024"
 authors = ["Devin Droddy <devin@justdeeevin.dev"]
 license = "MIT"
@@ -34,7 +34,7 @@ smol = ["dep:smol"]
 tokio = ["dep:tokio", "dep:tokio-stream", "dep:tokio-util"]
 futures = ["dep:futures"]
 
-full = ["lock", "channel", "exec", "fs"]
+full = ["lock", "channel", "exec", "fs", "time", "net"]
 exec = ["tokio/rt-multi-thread", "futures/thread-pool"]
 lock = ["tokio/sync"]
 channel = ["dep:futures-lite", "tokio/sync", "tokio-stream/sync"]
