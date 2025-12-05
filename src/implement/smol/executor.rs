@@ -14,6 +14,13 @@ impl Executor for smol::Executor<'_> {
     fn block_on<T: Send + 'static, F: Future<Output = T> + Send + 'static>(&self, future: F) -> T {
         smol::block_on(future)
     }
+
+    fn new() -> std::io::Result<Self>
+    where
+        Self: Sized,
+    {
+        Ok(smol::Executor::new())
+    }
 }
 
 impl RuntimeExecutor for Smol {

@@ -1,6 +1,6 @@
 [package]
 name = "byor"
-version = "1.0.0-alpha.3"
+version = "1.0.0-alpha.4"
 edition = "2024"
 authors = ["Devin Droddy <devin@justdeeevin.dev"]
 license = "MIT"

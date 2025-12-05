@@ -22,6 +22,11 @@ pub trait Executor {
 
     /// Run a future to completion.
     fn block_on<T: Send + 'static, F: Future<Output = T> + Send + 'static>(&self, future: F) -> T;
+
+    /// Create a new executor.
+    fn new() -> std::io::Result<Self>
+    where
+        Self: Sized;
 }
 
 /// A runtime with an executor.

@@ -14,6 +14,15 @@ impl Executor for tokio::runtime::Runtime {
     fn block_on<T: Send + 'static, F: Future<Output = T> + Send + 'static>(&self, future: F) -> T {
         self.block_on(future)
     }
+
+    fn new() -> std::io::Result<Self>
+    where
+        Self: Sized,
+    {
+        tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+    }
 }
 
 impl RuntimeExecutor for Tokio {

@@ -14,6 +14,13 @@ impl Executor for futures::executor::ThreadPool {
     fn block_on<T: Send + 'static, F: Future<Output = T> + Send + 'static>(&self, future: F) -> T {
         futures::executor::block_on(future)
     }
+
+    fn new() -> std::io::Result<Self>
+    where
+        Self: Sized,
+    {
+        Ok(futures::executor::ThreadPool::new().unwrap())
+    }
 }
 
 impl RuntimeExecutor for Futures {
