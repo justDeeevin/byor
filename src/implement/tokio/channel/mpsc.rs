@@ -88,21 +88,19 @@ impl<T> Receiver<T> for tokio_stream::wrappers::UnboundedReceiverStream<T> {
 }
 
 impl RuntimeMpsc for Tokio {
-    type BoundedSender<T: 'static> = tokio::sync::mpsc::Sender<T>;
+    type BoundedSender<T> = tokio::sync::mpsc::Sender<T>;
     type BoundedReceiver<T> = tokio_stream::wrappers::ReceiverStream<T>;
 
-    fn bounded_channel<T: 'static>(
-        buffer: usize,
-    ) -> (Self::BoundedSender<T>, Self::BoundedReceiver<T>) {
+    fn bounded_channel<T>(buffer: usize) -> (Self::BoundedSender<T>, Self::BoundedReceiver<T>) {
         let (tx, rx) = tokio::sync::mpsc::channel(buffer);
 
         (tx, rx.into())
     }
 
-    type UnboundedSender<T: 'static> = tokio::sync::mpsc::UnboundedSender<T>;
+    type UnboundedSender<T> = tokio::sync::mpsc::UnboundedSender<T>;
     type UnboundedReceiver<T> = tokio_stream::wrappers::UnboundedReceiverStream<T>;
 
-    fn unbounded_channel<T: 'static>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>) {
+    fn unbounded_channel<T>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>) {
         let (tx, rx) = tokio::sync::mpsc::unbounded_channel();
 
         (tx, rx.into())

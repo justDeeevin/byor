@@ -28,8 +28,8 @@ pub trait Sender<T> {
 
 /// Await a oneshot receiver to yield a value.
 pub trait Receiver<T>: Future<Output = Result<T, Self::RecvError>> {
-    type TryRecvError: std::error::Error;
-    type RecvError: std::error::Error;
+    type TryRecvError;
+    type RecvError;
 
     /// Closes the channel, preventing the associated [`Sender`] from sending a value.
     fn close(&mut self);

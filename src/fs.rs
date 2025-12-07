@@ -147,7 +147,7 @@ pub trait DirEntry {
 /// [`BufReader`](futures_lite::io::BufReader) or [`BufWriter`](futures_lite::io::BufWriter) when performing many
 /// small read or write calls, unless unbuffered reads and writes are required.
 pub trait File: AsRawFd + AsyncRead + AsyncWrite + AsyncSeek {
-    type OpenOptions: OpenOptions + 'static;
+    type OpenOptions: OpenOptions;
 
     /// Opens a file in write-only mode.
     ///

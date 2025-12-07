@@ -10,7 +10,7 @@ impl Executor for smol::Executor<'_> {
         self.spawn(future)
     }
 
-    fn block_on<T: Send + 'static, F: Future<Output = T> + Send + 'static>(&self, future: F) -> T {
+    fn block_on<T, F: Future<Output = T>>(&self, future: F) -> T {
         smol::block_on(future)
     }
 
@@ -22,7 +22,7 @@ impl Executor for smol::Executor<'_> {
     }
 }
 
-impl<T> Handle<T> for smol::Task<T> {
+impl<T: 'static> Handle<T> for smol::Task<T> {
     type Wrap<U> = U;
 
     fn detach(self) {

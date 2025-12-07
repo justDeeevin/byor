@@ -9,7 +9,7 @@ impl<T> Sender<T> for smol::channel::Sender<T> {
     }
 }
 
-impl<T: 'static> BoundedSender<T> for SmolSender<T> {
+impl<T> BoundedSender<T> for SmolSender<T> {
     type TrySendError = smol::channel::TrySendError<T>;
 
     fn send(&mut self, message: T) -> impl Future<Output = Result<(), Self::SendError>> {
@@ -44,19 +44,17 @@ impl<T> UnboundedSender<T> for SmolSender<T> {
 }
 
 impl RuntimeMpsc for Smol {
-    type BoundedSender<T: 'static> = smol::channel::Sender<T>;
+    type BoundedSender<T> = smol::channel::Sender<T>;
     type BoundedReceiver<T> = smol::channel::Receiver<T>;
 
-    fn bounded_channel<T: 'static>(
-        buffer: usize,
-    ) -> (Self::BoundedSender<T>, Self::BoundedReceiver<T>) {
+    fn bounded_channel<T>(buffer: usize) -> (Self::BoundedSender<T>, Self::BoundedReceiver<T>) {
         smol::channel::bounded(buffer)
     }
 
-    type UnboundedSender<T: 'static> = smol::channel::Sender<T>;
+    type UnboundedSender<T> = smol::channel::Sender<T>;
     type UnboundedReceiver<T> = smol::channel::Receiver<T>;
 
-    fn unbounded_channel<T: 'static>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>) {
+    fn unbounded_channel<T>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>) {
         smol::channel::unbounded()
     }
 }

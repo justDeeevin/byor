@@ -1,4 +1,4 @@
-//! A task executor that can spawn futures to be run concurrently.
+//! A multi-threaded task executor that can spawn futures to be run concurrently.
 
 pub trait Executor {
     type Handle<T: 'static>: Handle<T>;
@@ -12,7 +12,7 @@ pub trait Executor {
     ) -> Self::Handle<T>;
 
     /// Run a future to completion.
-    fn block_on<T: Send + 'static, F: Future<Output = T> + Send + 'static>(&self, future: F) -> T;
+    fn block_on<T, F: Future<Output = T>>(&self, future: F) -> T;
 
     /// Create a new executor.
     fn new() -> std::io::Result<Self>
@@ -23,7 +23,7 @@ pub trait Executor {
 /// A handle to a spawned task.
 ///
 /// Dropping the handle will cancel the task. Awaiting it will wait for the task to complete.
-pub trait Handle<T>: Future<Output = Self::Wrap<T>> {
+pub trait Handle<T: 'static>: Future<Output = Self::Wrap<T>> {
     /// A wrapper around the return type of a task.
     ///
     /// This is only used by tokio, whose [`JoinHandle`](tokio::task::JoinHandle) returns a

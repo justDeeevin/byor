@@ -4,7 +4,7 @@ use futures_lite::Stream;
 
 /// Base sender behavior for both unbounded and bounded channels.
 pub trait Sender<T>: Clone {
-    type SendError: std::error::Error;
+    type SendError;
 
     /// Returns whether the channel is closed.
     fn is_closed(&self) -> bool;
@@ -22,7 +22,7 @@ pub trait SenderExt<T>: Sender<T> {
 
 /// A sender to a channel with a maximum capacity.
 pub trait BoundedSender<T>: Sender<T> {
-    type TrySendError: std::error::Error;
+    type TrySendError;
 
     /// Sends message, waiting until there is capacity.
     ///
@@ -35,7 +35,7 @@ pub trait BoundedSender<T>: Sender<T> {
 
 /// Receiver behavior for both unbounded and bounded channels.
 pub trait Receiver<T>: Stream<Item = T> {
-    type TryRecvError: std::error::Error;
+    type TryRecvError;
 
     /// Closes the channel, preventing any further messages from being sent.
     ///
@@ -63,15 +63,13 @@ pub trait UnboundedSender<T>: Sender<T> {
 
 /// A runtime with an MPSC channel.
 pub trait RuntimeMpsc {
-    type BoundedSender<T: 'static>: BoundedSender<T>;
+    type BoundedSender<T>: BoundedSender<T>;
     type BoundedReceiver<T>: Receiver<T>;
 
-    fn bounded_channel<T: 'static>(
-        buffer: usize,
-    ) -> (Self::BoundedSender<T>, Self::BoundedReceiver<T>);
+    fn bounded_channel<T>(buffer: usize) -> (Self::BoundedSender<T>, Self::BoundedReceiver<T>);
 
-    type UnboundedSender<T: 'static>: UnboundedSender<T>;
+    type UnboundedSender<T>: UnboundedSender<T>;
     type UnboundedReceiver<T>: Receiver<T>;
 
-    fn unbounded_channel<T: 'static>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>);
+    fn unbounded_channel<T>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>);
 }

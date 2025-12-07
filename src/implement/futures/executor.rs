@@ -10,7 +10,7 @@ impl Executor for futures::executor::ThreadPool {
         futures::task::SpawnExt::spawn_with_handle(self, future).unwrap()
     }
 
-    fn block_on<T: Send + 'static, F: Future<Output = T> + Send + 'static>(&self, future: F) -> T {
+    fn block_on<T, F: Future<Output = T>>(&self, future: F) -> T {
         futures::executor::block_on(future)
     }
 
