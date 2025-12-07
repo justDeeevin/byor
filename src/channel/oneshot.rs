@@ -1,6 +1,9 @@
 //! A channel used for sending a single message between asynchronous tasks.
 
-use std::task::{Context, Poll};
+use std::{
+    error::Error,
+    task::{Context, Poll},
+};
 
 pub trait Sender<T> {
     /// Attempts to send a value on this channel, returning it back if it could not be sent.
@@ -28,8 +31,8 @@ pub trait Sender<T> {
 
 /// Await a oneshot receiver to yield a value.
 pub trait Receiver<T>: Future<Output = Result<T, Self::RecvError>> {
-    type TryRecvError;
-    type RecvError;
+    type TryRecvError: Error;
+    type RecvError: Error;
 
     /// Closes the channel, preventing the associated [`Sender`] from sending a value.
     fn close(&mut self);

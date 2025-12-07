@@ -1,10 +1,12 @@
 //! A multi-producer, single-consumer queue for sending values between asynchronous tasks.
 
+use std::error::Error;
+
 use futures_lite::Stream;
 
 /// Base sender behavior for both unbounded and bounded channels.
-pub trait Sender<T>: Clone {
-    type SendError;
+pub trait Sender<T: 'static>: Clone {
+    type SendError: Error;
 
     /// Returns whether the channel is closed.
     fn is_closed(&self) -> bool;
@@ -12,7 +14,7 @@ pub trait Sender<T>: Clone {
 
 /// More extensive behavior for `Sender` implemented by tokio and futures (that is, only _not_
 /// implemented by smol).
-pub trait SenderExt<T>: Sender<T> {
+pub trait SenderExt<T: 'static>: Sender<T> {
     /// Completes when the receiver has closed.
     fn closed(&mut self) -> impl Future<Output = ()>;
 
@@ -21,8 +23,8 @@ pub trait SenderExt<T>: Sender<T> {
 }
 
 /// A sender to a channel with a maximum capacity.
-pub trait BoundedSender<T>: Sender<T> {
-    type TrySendError;
+pub trait BoundedSender<T: 'static>: Sender<T> {
+    type TrySendError: Error;
 
     /// Sends message, waiting until there is capacity.
     ///
@@ -34,8 +36,8 @@ pub trait BoundedSender<T>: Sender<T> {
 }
 
 /// Receiver behavior for both unbounded and bounded channels.
-pub trait Receiver<T>: Stream<Item = T> {
-    type TryRecvError;
+pub trait Receiver<T: 'static>: Stream<Item = T> {
+    type TryRecvError: Error;
 
     /// Closes the channel, preventing any further messages from being sent.
     ///
@@ -51,7 +53,7 @@ pub trait Receiver<T>: Stream<Item = T> {
 }
 
 /// A sender to a channel without a maximum capacity.
-pub trait UnboundedSender<T>: Sender<T> {
+pub trait UnboundedSender<T: 'static>: Sender<T> {
     /// Sends a message.
     ///
     /// Note that this is not marked as async—this method will never block because the channel will
@@ -63,13 +65,15 @@ pub trait UnboundedSender<T>: Sender<T> {
 
 /// A runtime with an MPSC channel.
 pub trait RuntimeMpsc {
-    type BoundedSender<T>: BoundedSender<T>;
-    type BoundedReceiver<T>: Receiver<T>;
+    type BoundedSender<T: 'static>: BoundedSender<T>;
+    type BoundedReceiver<T: 'static>: Receiver<T>;
 
-    fn bounded_channel<T>(buffer: usize) -> (Self::BoundedSender<T>, Self::BoundedReceiver<T>);
+    fn bounded_channel<T: 'static>(
+        buffer: usize,
+    ) -> (Self::BoundedSender<T>, Self::BoundedReceiver<T>);
 
-    type UnboundedSender<T>: UnboundedSender<T>;
-    type UnboundedReceiver<T>: Receiver<T>;
+    type UnboundedSender<T: 'static>: UnboundedSender<T>;
+    type UnboundedReceiver<T: 'static>: Receiver<T>;
 
-    fn unbounded_channel<T>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>);
+    fn unbounded_channel<T: 'static>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>);
 }
