@@ -146,22 +146,18 @@ pub trait DirEntry {
 /// `File` does not buffer reads and writes. For efficiency, consider using a
 /// [`BufReader`](futures_lite::io::BufReader) or [`BufWriter`](futures_lite::io::BufWriter) when performing many
 /// small read or write calls, unless unbuffered reads and writes are required.
-pub trait File: AsRawFd + AsyncRead + AsyncWrite + AsyncSeek {
+pub trait File: AsRawFd + AsyncRead + AsyncWrite + AsyncSeek + Sized {
     type OpenOptions: OpenOptions;
 
     /// Opens a file in write-only mode.
     ///
     /// Creates a file if it does not exist, and truncates it if it does.
-    fn create(path: impl AsRef<Path>) -> impl Future<Output = Result<Self>>
-    where
-        Self: Sized;
+    fn create(path: impl AsRef<Path>) -> impl Future<Output = Result<Self>>;
 
     /// Opens a file in read-write mode.
     ///
     /// Creates a file if it does not exist, or returns an error if it does.
-    fn create_new(path: impl AsRef<Path>) -> impl Future<Output = Result<Self>>
-    where
-        Self: Sized;
+    fn create_new(path: impl AsRef<Path>) -> impl Future<Output = Result<Self>>;
 
     /// Queries metadata about the underlying file.
     fn metadata(&self) -> impl Future<Output = Result<Metadata>>;
@@ -170,9 +166,7 @@ pub trait File: AsRawFd + AsyncRead + AsyncWrite + AsyncSeek {
     ///
     /// If you only need to read the entire file contents, consider using [`Fs::read`] or
     /// [`Fs::read_to_string`] instead.
-    fn open(path: impl AsRef<Path>) -> impl Future<Output = Result<Self>>
-    where
-        Self: Sized;
+    fn open(path: impl AsRef<Path>) -> impl Future<Output = Result<Self>>;
 
     /// Truncates or extends the underlying file, updating the sive of this file to become `size`.
     ///

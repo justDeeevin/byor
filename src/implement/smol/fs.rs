@@ -108,26 +108,19 @@ impl DirEntry for smol::fs::DirEntry {
 impl File for smol::fs::File {
     type OpenOptions = smol::fs::OpenOptions;
 
-    fn create(path: impl AsRef<std::path::Path>) -> impl Future<Output = std::io::Result<Self>>
-    where
-        Self: Sized,
-    {
+    fn create(path: impl AsRef<std::path::Path>) -> impl Future<Output = std::io::Result<Self>> {
         smol::fs::File::create(path)
     }
-    fn create_new(path: impl AsRef<std::path::Path>) -> impl Future<Output = std::io::Result<Self>>
-    where
-        Self: Sized,
-    {
+    fn create_new(
+        path: impl AsRef<std::path::Path>,
+    ) -> impl Future<Output = std::io::Result<Self>> {
         smol::fs::OpenOptions::new()
             .read(true)
             .write(true)
             .create_new(true)
             .open(path)
     }
-    fn open(path: impl AsRef<std::path::Path>) -> impl Future<Output = std::io::Result<Self>>
-    where
-        Self: Sized,
-    {
+    fn open(path: impl AsRef<std::path::Path>) -> impl Future<Output = std::io::Result<Self>> {
         smol::fs::File::open(path)
     }
     fn set_len(&self, len: u64) -> impl Future<Output = std::io::Result<()>> {

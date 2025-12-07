@@ -3,30 +3,19 @@ use crate::{executor::*, runtime::Futures};
 impl Executor for futures::executor::ThreadPool {
     type Handle<T: 'static> = futures::future::RemoteHandle<T>;
 
-    fn spawn<T: Send + 'static, F: Future<Output = T> + Send + 'static>(
+    fn spawn<T: Send + 'static>(
         &self,
-        future: F,
+        future: impl Future<Output = T> + Send + 'static,
     ) -> Self::Handle<T> {
         futures::task::SpawnExt::spawn_with_handle(self, future).unwrap()
     }
 
-    fn block_on<T, F: Future<Output = T>>(&self, future: F) -> T {
+    fn block_on<T>(&self, future: impl Future<Output = T>) -> T {
         futures::executor::block_on(future)
     }
 
-    fn new() -> std::io::Result<Self>
-    where
-        Self: Sized,
-    {
+    fn new() -> std::io::Result<Self> {
         Ok(futures::executor::ThreadPool::new().unwrap())
-    }
-}
-
-impl<T: 'static> Handle<T> for futures::future::RemoteHandle<T> {
-    type Wrap<U> = U;
-
-    fn detach(self) {
-        self.forget();
     }
 }
 

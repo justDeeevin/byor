@@ -13,7 +13,7 @@ pub mod lock;
 #[cfg(feature = "channel")]
 pub mod channel;
 
-#[cfg(feature = "exec")]
+#[cfg(any(feature = "exec", feature = "local-exec"))]
 pub mod executor;
 
 #[cfg(feature = "fs")]

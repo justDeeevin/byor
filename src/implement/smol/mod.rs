@@ -4,7 +4,7 @@ mod lock;
 #[cfg(feature = "channel")]
 mod channel;
 
-#[cfg(feature = "exec")]
+#[cfg(any(feature = "exec", feature = "local-exec"))]
 mod executor;
 
 #[cfg(feature = "fs")]
