@@ -30,9 +30,9 @@ futures-lite = { version = "2.6.1", default-features = false, features = [
 [features]
 default = ["full"]
 
-smol = ["dep:smol"]
-tokio = ["dep:tokio", "dep:tokio-stream", "dep:tokio-util"]
-futures = ["dep:futures"]
+impl-smol = ["dep:smol"]
+impl-tokio = ["dep:tokio", "dep:tokio-stream", "dep:tokio-util"]
+impl-futures = ["dep:futures"]
 
 full = ["lock", "channel", "exec", "fs", "time", "net"]
 exec = ["tokio/rt-multi-thread", "futures/thread-pool", "tokio-util/rt"]
