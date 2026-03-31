@@ -6,7 +6,7 @@ impl Fs for crate::runtime::Tokio {
     type File = Compat<tokio::fs::File>;
     type DirEntry = tokio::fs::DirEntry;
 
-    fn canonocalize(
+    fn canonicalize(
         path: impl AsRef<std::path::Path>,
     ) -> impl Future<Output = std::io::Result<std::path::PathBuf>> {
         tokio::fs::canonicalize(path)

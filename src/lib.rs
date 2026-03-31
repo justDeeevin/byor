@@ -25,6 +25,9 @@ pub mod time;
 #[cfg(feature = "net")]
 pub mod net;
 
+#[cfg(feature = "process")]
+pub mod process;
+
 #[cfg(any(
     feature = "impl-tokio",
     feature = "impl-smol",

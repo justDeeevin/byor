@@ -5,7 +5,7 @@ impl Fs for crate::runtime::Smol {
     type File = async_fs::File;
     type DirEntry = async_fs::DirEntry;
 
-    fn canonocalize(
+    fn canonicalize(
         path: impl AsRef<std::path::Path>,
     ) -> impl Future<Output = std::io::Result<std::path::PathBuf>> {
         async_fs::canonicalize(path)

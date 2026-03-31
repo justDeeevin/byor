@@ -21,7 +21,7 @@ pub trait Fs {
 
     /// Returns the canonical, absolute form of a path with all intermediate components normalized
     /// and symbolic links resolved.
-    fn canonocalize(path: impl AsRef<Path>) -> impl Future<Output = Result<PathBuf>>;
+    fn canonicalize(path: impl AsRef<Path>) -> impl Future<Output = Result<PathBuf>>;
 
     /// Copies the contents of one file to another. This function will also copy the permission
     /// bits of the original file to the destination file.
