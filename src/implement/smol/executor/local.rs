@@ -1,21 +1,21 @@
 use crate::{executor::local::*, runtime::Smol};
 
-impl Executor for smol::LocalExecutor<'_> {
-    type Handle<T: 'static> = smol::Task<T>;
+impl Executor for async_executor::LocalExecutor<'_> {
+    type Handle<T: 'static> = async_executor::Task<T>;
 
     fn spawn<T: 'static>(&self, future: impl Future<Output = T> + 'static) -> Self::Handle<T> {
         self.spawn(future)
     }
 
     fn block_on<T>(&self, future: impl Future<Output = T>) -> T {
-        smol::block_on(future)
+        async_io::block_on(future)
     }
 
     fn new() -> std::io::Result<Self> {
-        Ok(smol::LocalExecutor::new())
+        Ok(async_executor::LocalExecutor::new())
     }
 }
 
 impl RuntimeExecutor for Smol {
-    type Executor = smol::LocalExecutor<'static>;
+    type Executor = async_executor::LocalExecutor<'static>;
 }

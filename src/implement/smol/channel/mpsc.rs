@@ -1,8 +1,8 @@
 use crate::{channel::mpsc::*, runtime::Smol};
-use smol::channel::{Receiver as SmolReceiver, Sender as SmolSender};
+use async_channel::{Receiver as SmolReceiver, Sender as SmolSender};
 
-impl<T: 'static> Sender<T> for smol::channel::Sender<T> {
-    type SendError = smol::channel::SendError<T>;
+impl<T: 'static> Sender<T> for async_channel::Sender<T> {
+    type SendError = async_channel::SendError<T>;
 
     fn is_closed(&self) -> bool {
         self.is_closed()
@@ -10,7 +10,7 @@ impl<T: 'static> Sender<T> for smol::channel::Sender<T> {
 }
 
 impl<T: 'static> BoundedSender<T> for SmolSender<T> {
-    type TrySendError = smol::channel::TrySendError<T>;
+    type TrySendError = async_channel::TrySendError<T>;
 
     fn send(&mut self, message: T) -> impl Future<Output = Result<(), Self::SendError>> {
         SmolSender::send(self, message)
@@ -21,8 +21,8 @@ impl<T: 'static> BoundedSender<T> for SmolSender<T> {
     }
 }
 
-impl<T: 'static> Receiver<T> for smol::channel::Receiver<T> {
-    type TryRecvError = smol::channel::TryRecvError;
+impl<T: 'static> Receiver<T> for async_channel::Receiver<T> {
+    type TryRecvError = async_channel::TryRecvError;
 
     fn close(&mut self) {
         SmolReceiver::close(self);
@@ -44,19 +44,19 @@ impl<T: 'static> UnboundedSender<T> for SmolSender<T> {
 }
 
 impl RuntimeMpsc for Smol {
-    type BoundedSender<T: 'static> = smol::channel::Sender<T>;
-    type BoundedReceiver<T: 'static> = smol::channel::Receiver<T>;
+    type BoundedSender<T: 'static> = async_channel::Sender<T>;
+    type BoundedReceiver<T: 'static> = async_channel::Receiver<T>;
 
     fn bounded_channel<T: 'static>(
         buffer: usize,
     ) -> (Self::BoundedSender<T>, Self::BoundedReceiver<T>) {
-        smol::channel::bounded(buffer)
+        async_channel::bounded(buffer)
     }
 
-    type UnboundedSender<T: 'static> = smol::channel::Sender<T>;
-    type UnboundedReceiver<T: 'static> = smol::channel::Receiver<T>;
+    type UnboundedSender<T: 'static> = async_channel::Sender<T>;
+    type UnboundedReceiver<T: 'static> = async_channel::Receiver<T>;
 
     fn unbounded_channel<T: 'static>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>) {
-        smol::channel::unbounded()
+        async_channel::unbounded()
     }
 }

@@ -1,7 +1,7 @@
 use crate::{lock::*, runtime::Smol};
 
-impl Barrier for smol::lock::Barrier {
-    type WaitResult = smol::lock::BarrierWaitResult;
+impl Barrier for async_lock::Barrier {
+    type WaitResult = async_lock::BarrierWaitResult;
 
     fn new(n: usize) -> Self {
         Self::new(n)
@@ -12,15 +12,15 @@ impl Barrier for smol::lock::Barrier {
     }
 }
 
-impl BarrierWaitResult for smol::lock::BarrierWaitResult {
+impl BarrierWaitResult for async_lock::BarrierWaitResult {
     fn is_leader(&self) -> bool {
         self.is_leader()
     }
 }
 
-impl<T: ?Sized> Mutex<T> for smol::lock::Mutex<T> {
+impl<T: ?Sized> Mutex<T> for async_lock::Mutex<T> {
     type Guard<'a>
-        = smol::lock::MutexGuard<'a, T>
+        = async_lock::MutexGuard<'a, T>
     where
         Self: 'a;
 
@@ -51,25 +51,25 @@ impl<T: ?Sized> Mutex<T> for smol::lock::Mutex<T> {
     }
 }
 
-impl<'a, T: ?Sized + 'a> MutexExt<'a, T> for smol::lock::Mutex<T> {
+impl<'a, T: ?Sized + 'a> MutexExt<'a, T> for async_lock::Mutex<T> {
     fn blocking_lock(&self) -> Self::Guard<'_> {
         self.lock_blocking()
     }
 }
 
-impl<'a, T: ?Sized> MutexGuard<'a, T> for smol::lock::MutexGuard<'a, T> {
+impl<'a, T: ?Sized> MutexGuard<'a, T> for async_lock::MutexGuard<'a, T> {
     fn source(this: &Self) -> &'a (impl Mutex<T, Guard<'a> = Self> + ?Sized + 'a) {
         Self::source(this)
     }
 }
 
-impl<T: ?Sized> RwLock<T> for smol::lock::RwLock<T> {
+impl<T: ?Sized> RwLock<T> for async_lock::RwLock<T> {
     type ReadGuard<'a>
-        = smol::lock::RwLockReadGuard<'a, T>
+        = async_lock::RwLockReadGuard<'a, T>
     where
         Self: 'a;
     type WriteGuard<'a>
-        = smol::lock::RwLockWriteGuard<'a, T>
+        = async_lock::RwLockWriteGuard<'a, T>
     where
         Self: 'a;
 
@@ -116,18 +116,18 @@ impl<T: ?Sized> RwLock<T> for smol::lock::RwLock<T> {
     }
 }
 
-impl<T: ?Sized> RwLockReadGuard<T> for smol::lock::RwLockReadGuard<'_, T> {}
+impl<T: ?Sized> RwLockReadGuard<T> for async_lock::RwLockReadGuard<'_, T> {}
 
-impl<T: ?Sized> RwLockReadGuard<T> for smol::lock::RwLockWriteGuard<'_, T> {}
-impl<T: ?Sized> RwLockWriteGuard<T> for smol::lock::RwLockWriteGuard<'_, T> {
+impl<T: ?Sized> RwLockReadGuard<T> for async_lock::RwLockWriteGuard<'_, T> {}
+impl<T: ?Sized> RwLockWriteGuard<T> for async_lock::RwLockWriteGuard<'_, T> {
     fn downgrade(self) -> impl RwLockReadGuard<T> {
         Self::downgrade(self)
     }
 }
 
-impl Semaphore for smol::lock::Semaphore {
+impl Semaphore for async_lock::Semaphore {
     type Permit<'a>
-        = smol::lock::SemaphoreGuard<'a>
+        = async_lock::SemaphoreGuard<'a>
     where
         Self: 'a;
 
@@ -148,18 +148,18 @@ impl Semaphore for smol::lock::Semaphore {
     }
 }
 
-impl SemaphorePermit for smol::lock::SemaphoreGuard<'_> {
+impl SemaphorePermit for async_lock::SemaphoreGuard<'_> {
     fn forget(self) {
         self.forget()
     }
 }
 
 impl RuntimeLock for Smol {
-    type Mutex<T: ?Sized> = smol::lock::Mutex<T>;
+    type Mutex<T: ?Sized> = async_lock::Mutex<T>;
 }
 
 impl RuntimeLockExt for Smol {
-    type RwLock<T: ?Sized> = smol::lock::RwLock<T>;
-    type Barrier = smol::lock::Barrier;
-    type Semaphore = smol::lock::Semaphore;
+    type RwLock<T: ?Sized> = async_lock::RwLock<T>;
+    type Barrier = async_lock::Barrier;
+    type Semaphore = async_lock::Semaphore;
 }

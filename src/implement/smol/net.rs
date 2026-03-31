@@ -4,9 +4,9 @@ use std::{
     net::{Ipv4Addr, Ipv6Addr, SocketAddr},
 };
 
-impl TcpStream for smol::net::TcpStream {
+impl TcpStream for async_net::TcpStream {
     async fn connect(addr: impl ToSocketAddrs) -> Result<Self> {
-        smol::net::TcpStream::connect(Smol::get_socket_addrs(addr.kind()).await?.as_slice()).await
+        async_net::TcpStream::connect(Smol::get_socket_addrs(addr.kind()).await?.as_slice()).await
     }
     fn local_addr(&self) -> Result<SocketAddr> {
         self.local_addr()
@@ -31,12 +31,12 @@ impl TcpStream for smol::net::TcpStream {
     }
 }
 
-impl TcpListener for smol::net::TcpListener {
+impl TcpListener for async_net::TcpListener {
     async fn accept(&self) -> Result<(impl TcpStream, SocketAddr)> {
         self.accept().await
     }
     async fn bind(addr: impl ToSocketAddrs) -> Result<Self> {
-        smol::net::TcpListener::bind(Smol::get_socket_addrs(addr.kind()).await?.as_slice()).await
+        async_net::TcpListener::bind(Smol::get_socket_addrs(addr.kind()).await?.as_slice()).await
     }
     fn local_addr(&self) -> Result<SocketAddr> {
         self.local_addr()
@@ -49,9 +49,9 @@ impl TcpListener for smol::net::TcpListener {
     }
 }
 
-impl UdpSocket for smol::net::UdpSocket {
+impl UdpSocket for async_net::UdpSocket {
     async fn bind(addr: impl ToSocketAddrs) -> Result<Self> {
-        smol::net::UdpSocket::bind(Smol::get_socket_addrs(addr.kind()).await?.as_slice()).await
+        async_net::UdpSocket::bind(Smol::get_socket_addrs(addr.kind()).await?.as_slice()).await
     }
     fn broadcast(&self) -> Result<bool> {
         self.broadcast()
@@ -127,12 +127,12 @@ impl UdpSocket for smol::net::UdpSocket {
 }
 
 impl RuntimeNet for Smol {
-    type TcpStream = smol::net::TcpStream;
-    type TcpListener = smol::net::TcpListener;
-    type UdpSocket = smol::net::UdpSocket;
+    type TcpStream = async_net::TcpStream;
+    type TcpListener = async_net::TcpListener;
+    type UdpSocket = async_net::UdpSocket;
 
     async fn get_socket_addrs(kind: SocketAddrsKind<'_>) -> Result<Vec<std::net::SocketAddr>> {
-        use smol::net::resolve;
+        use async_net::resolve;
         match kind {
             SocketAddrsKind::Slice(addrs) => resolve(addrs).await,
             SocketAddrsKind::StrPort(host, port) => resolve((host, port)).await,

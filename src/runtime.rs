@@ -5,7 +5,7 @@
 pub struct Tokio;
 
 #[cfg(feature = "impl-smol")]
-/// [`smol`]
+/// [`smol`](https://docs.rs/smol)
 pub struct Smol;
 
 #[cfg(feature = "impl-futures")]
