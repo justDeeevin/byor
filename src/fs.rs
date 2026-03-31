@@ -33,7 +33,7 @@ pub trait Fs {
     /// On success, the total number of bytes copied is returned and it is equal to the length of the to file as reported by metadata.
     fn copy(from: impl AsRef<Path>, to: impl AsRef<Path>) -> impl Future<Output = Result<u64>>;
 
-    /// Creates a new, empty directory at theh provided path.
+    /// Creates a new, empty directory at the provided path.
     fn create_dir(path: impl AsRef<Path>) -> impl Future<Output = Result<()>>;
 
     /// Recursively create a directory and all of its parent components if they are missing.
@@ -57,7 +57,7 @@ pub trait Fs {
     /// Reads the entire contents of a file into a bytes vector.
     fn read(path: impl AsRef<Path>) -> impl Future<Output = Result<Vec<u8>>>;
 
-    /// Returns an stream of the entries within a directory.
+    /// Returns a stream of the entries within a directory.
     ///
     /// The order of entries is unspecified.
     fn read_dir(
@@ -76,7 +76,7 @@ pub trait Fs {
     /// [`remove_dir_all`](Fs::remove_dir_all) instead.
     fn remove_dir(path: impl AsRef<Path>) -> impl Future<Output = Result<()>>;
 
-    /// Removes a directory after recursiveely removing all of its contents. **Use carefully!**
+    /// Removes a directory after recursively removing all of its contents. **Use carefully!**
     ///
     /// This function does **not** follow symbolic links, simply removing the links themselves.
     fn remove_dir_all(path: impl AsRef<Path>) -> impl Future<Output = Result<()>>;
@@ -125,7 +125,7 @@ pub trait DirEntry {
     /// This will not traverse symlinks.
     fn file_type(&self) -> impl Future<Output = Result<FileType>>;
 
-    /// Returns the metadata fot the file at which this entry points.
+    /// Returns the metadata for the file at which this entry points.
     ///
     /// This will not traverse symlinks. To do so, use [`Fs::metadata`] or [`File::metadata`].
     fn metadata(&self) -> impl Future<Output = Result<Metadata>>;
@@ -168,7 +168,7 @@ pub trait File: AsRawFd + AsyncRead + AsyncWrite + AsyncSeek + Sized {
     /// [`Fs::read_to_string`] instead.
     fn open(path: impl AsRef<Path>) -> impl Future<Output = Result<Self>>;
 
-    /// Truncates or extends the underlying file, updating the sive of this file to become `size`.
+    /// Truncates or extends the underlying file, updating the size of this file to become `size`.
     ///
     /// When extending a file, the contents are zero-filled.
     ///

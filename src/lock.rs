@@ -42,7 +42,7 @@ pub trait MutexGuard<'a, T: ?Sized>: Deref<Target = T> + DerefMut {
     fn source(this: &Self) -> &'a (impl Mutex<T, Guard<'a> = Self> + ?Sized + 'a);
 }
 
-/// More extensive behavior for `Mutex` implemented by tokio and smol (that is, only _not_
+/// More extensive behavior for [`Mutex`] implemented by tokio and smol (that is, only _not_
 /// implemented by futures).
 pub trait MutexExt<'a, T: ?Sized>: Mutex<T>
 where

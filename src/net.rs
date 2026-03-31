@@ -184,8 +184,9 @@ pub trait UdpSocket: AsFd + AsRawFd + Sized {
     /// Executes an operation of the `IP_ADD_MEMBERSHIP` type.
     ///
     /// This function specifies a new multicast group for this socket to join. The address must
-    /// be a valid multicast address, and `interface` is the address of the local interface wih
-    /// which the system should join the multicast group. If it's equal to `INADDR_ANY`, then
+    /// be a valid multicast address, and `interface` is the address of the local interface with
+    /// which the system should join the multicast group. If it's equal to
+    /// [`INADDR_ANY`](std::net::Ipv4Addr::UNSPECIFIED), then
     /// an appropriate interface is chosen by the system.
     fn join_multicast_v4(&self, multiaddr: Ipv4Addr, interface: Ipv4Addr) -> Result<()>;
 
@@ -224,12 +225,12 @@ pub trait UdpSocket: AsFd + AsRawFd + Sized {
     /// For more information about this option, see [`set_multicast_ttl_v4`](UdpSocket::set_multicast_ttl_v4).
     fn multicast_ttl_v4(&self) -> Result<u32>;
 
-    /// Receives a single daagram from the connected address without removing it from the
+    /// Receives a single datagram message from the connected address without removing it from the
     /// queue. On success, returns the number of bytes read from whence the data came.
     fn peek(&self, buf: &mut [u8]) -> impl Future<Output = Result<usize>>;
 
-    /// Receives data from the socket without removing it from the queue On success, returns
-    /// the number of bytes read and the address from whence the data came.
+    /// Receives a single datagram message from the socket without removing it from the queue.
+    /// On success, returns the number of bytes read and the address from whence the data came.
     fn peek_from(&self, buf: &mut [u8]) -> impl Future<Output = Result<(usize, SocketAddr)>>;
 
     /// Returns the socket address of the remote peer to which this socket is connected.
