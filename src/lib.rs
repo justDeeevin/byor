@@ -28,11 +28,7 @@ pub mod net;
 #[cfg(feature = "process")]
 pub mod process;
 
-#[cfg(any(
-    feature = "impl-tokio",
-    feature = "impl-smol",
-    feature = "impl-futures"
-))]
+#[cfg(any(feature = "tokio", feature = "smol", feature = "futures"))]
 pub mod runtime;
 
 mod implement;

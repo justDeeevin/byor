@@ -17,69 +17,50 @@ categories = [
 ]
 
 [dependencies]
-# general
-thiserror = "2.0.17"
 futures-lite = { version = "2.6.1", default-features = false, features = [
   "std",
 ], optional = true }
 
-# tokio
-tokio = { version = "1.48.0", optional = true }
-tokio-util = { version = "0.7.17", default-features = false, optional = true }
-tokio-stream = { version = "0.1.17", default-features = false, optional = true }
+tokio = { version = "1.50.0", optional = true, features = [
+  "sync",
+  "rt-multi-thread",
+  "rt",
+  "fs",
+  "time",
+  "net",
+  "process",
+] }
+tokio-util = { version = "0.7.18", default-features = false, optional = true, features = [
+  "rt",
+  "compat",
+] }
+tokio-stream = { version = "0.1.18", default-features = false, optional = true, features = [
+  "sync",
+  "fs",
+  "time",
+  "net",
+] }
 
-futures = { version = "0.3.31", default-features = false, optional = true }
+futures = { version = "0.3.32", default-features = false, optional = true, features = [
+  "thread-pool",
+  "executor",
+] }
 
-# smol
-async-lock = { version = "3.4.2", optional = true }
-async-channel = { version = "2.5.0", optional = true }
-async-executor = { version = "1.14.0", optional = true }
-async-fs = { version = "2.2.0", optional = true }
-async-io = { version = "2.6.0", optional = true }
-async-net = { version = "2.0.0", optional = true }
-async-process = { version = "2.5.0", optional = true }
+smol = { version = "2.0.2", optional = true }
 
 [features]
 default = ["full"]
 
-impl-smol = []
-impl-tokio = ["dep:tokio", "dep:tokio-stream", "dep:tokio-util"]
-impl-futures = ["dep:futures"]
+smol = ["dep:smol"]
+tokio = ["dep:tokio", "dep:tokio-stream", "dep:tokio-util"]
+futures = ["dep:futures"]
 
 full = ["lock", "channel", "exec", "fs", "time", "net", "process"]
-lock = ["tokio/sync", "dep:async-lock"]
-channel = [
-  "dep:futures-lite",
-  "tokio/sync",
-  "tokio-stream/sync",
-  "dep:async-channel",
-]
-exec = [
-  "tokio/rt-multi-thread",
-  "futures/thread-pool",
-  "tokio-util/rt",
-  "dep:async-executor",
-  "dep:async-io",
-]
-local-exec = [
-  "tokio/rt",
-  "futures/executor",
-  "tokio-util/rt",
-  "dep:async-executor",
-  "dep:async-io",
-]
-fs = [
-  "dep:futures-lite",
-  "tokio/fs",
-  "tokio-stream/fs",
-  "tokio-util/compat",
-  "dep:async-fs",
-]
-time = ["tokio/time", "tokio-stream/time", "dep:async-io"]
-net = ["tokio/net", "tokio-stream/net", "dep:async-net"]
-process = [
-  "dep:futures-lite",
-  "tokio/process",
-  "tokio-util/compat",
-  "dep:async-process",
-]
+lock = []
+channel = ["dep:futures-lite"]
+exec = []
+local-exec = []
+fs = ["dep:futures-lite"]
+time = []
+net = []
+process = ["dep:futures-lite"]

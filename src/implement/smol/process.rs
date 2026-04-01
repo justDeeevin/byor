@@ -1,18 +1,18 @@
 use crate::process::*;
 #[cfg(unix)]
-use async_process::unix::CommandExt as SmolCmdExt;
-use async_process::{ChildStderr, ChildStdin, ChildStdout};
+use smol::process::unix::CommandExt as SmolCmdExt;
+use smol::process::{ChildStderr, ChildStdin, ChildStdout};
 use std::{
     ffi::OsStr,
     io::Result,
     process::{ExitStatus, Output, Stdio},
 };
 
-impl Command for async_process::Command {
-    type Child = async_process::Child;
+impl Command for smol::process::Command {
+    type Child = smol::process::Child;
 
     fn new(program: impl AsRef<OsStr>) -> Self {
-        async_process::Command::new(program)
+        smol::process::Command::new(program)
     }
 
     fn arg(&mut self, arg: impl AsRef<OsStr>) -> &mut Self {
@@ -76,7 +76,7 @@ impl Command for async_process::Command {
 }
 
 #[cfg(unix)]
-impl CommandExt for async_process::Command {
+impl CommandExt for smol::process::Command {
     fn uid(&mut self, uid: u32) -> &mut Self {
         SmolCmdExt::uid(self, uid)
     }
@@ -90,7 +90,7 @@ impl CommandExt for async_process::Command {
     }
 }
 
-impl Child for async_process::Child {
+impl Child for smol::process::Child {
     type Stdin = ChildStdin;
     type StdinRef<'a> = &'a mut ChildStdin;
     type Stdout = ChildStdout;

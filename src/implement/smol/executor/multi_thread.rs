@@ -1,7 +1,7 @@
 use crate::{executor::*, runtime::Smol};
 
-impl Executor for async_executor::Executor<'_> {
-    type Handle<T: 'static> = async_executor::Task<T>;
+impl Executor for smol::Executor<'_> {
+    type Handle<T: 'static> = smol::Task<T>;
 
     fn spawn<T: Send + 'static>(
         &self,
@@ -11,14 +11,14 @@ impl Executor for async_executor::Executor<'_> {
     }
 
     fn block_on<T>(&self, future: impl Future<Output = T>) -> T {
-        async_io::block_on(future)
+        smol::block_on(future)
     }
 
     fn new() -> std::io::Result<Self> {
-        Ok(async_executor::Executor::new())
+        Ok(smol::Executor::new())
     }
 }
 
 impl RuntimeExecutor for Smol {
-    type Executor = async_executor::Executor<'static>;
+    type Executor = smol::Executor<'static>;
 }

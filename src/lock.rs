@@ -1,3 +1,5 @@
+#![cfg_attr(not(feature = "tokio"), allow(rustdoc::broken_intra_doc_links))]
+
 //! Async synchronization primitives.
 //!
 //! In general, using [`std::sync`] is preferred over their async counterparts. You should only

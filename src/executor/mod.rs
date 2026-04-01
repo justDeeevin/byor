@@ -12,6 +12,7 @@ pub mod local;
 ///
 /// Dropping the handle will cancel the task. Awaiting it will wait for the task to complete.
 pub trait Handle<T: 'static>: Future<Output = Self::Wrap<T>> {
+    #[cfg_attr(not(feature = "tokio"), allow(rustdoc::broken_intra_doc_links))]
     /// A wrapper around the return type of a task.
     ///
     /// This is only used by tokio, whose [`JoinHandle`](tokio::task::JoinHandle) returns a

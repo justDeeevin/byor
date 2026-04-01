@@ -1,8 +1,8 @@
-#[cfg(feature = "impl-smol")]
+#[cfg(feature = "smol")]
 mod smol;
 
-#[cfg(feature = "impl-tokio")]
+#[cfg(feature = "tokio")]
 mod tokio;
 
-#[cfg(feature = "impl-futures")]
+#[cfg(feature = "futures")]
 mod futures;

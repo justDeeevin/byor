@@ -38,7 +38,7 @@ impl<T: 'static> Receiver<T> for futures::channel::mpsc::Receiver<T> {
     }
 
     fn try_recv(&mut self) -> Result<Option<T>, Self::TryRecvError> {
-        self.try_next()
+        self.try_recv().map(Some)
     }
 }
 
@@ -74,7 +74,7 @@ impl<T: 'static> Receiver<T> for futures::channel::mpsc::UnboundedReceiver<T> {
     }
 
     fn try_recv(&mut self) -> Result<Option<T>, Self::TryRecvError> {
-        self.try_next()
+        self.try_recv().map(Some)
     }
 }
 

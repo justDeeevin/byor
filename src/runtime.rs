@@ -1,13 +1,13 @@
 //! Provided runtime implementations.
 
-#[cfg(feature = "impl-tokio")]
+#[cfg(feature = "tokio")]
 /// [`tokio`]
 pub struct Tokio;
 
-#[cfg(feature = "impl-smol")]
+#[cfg(feature = "smol")]
 /// [`smol`](https://docs.rs/smol)
 pub struct Smol;
 
-#[cfg(feature = "impl-futures")]
+#[cfg(feature = "futures")]
 /// [`futures`]
 pub struct Futures;

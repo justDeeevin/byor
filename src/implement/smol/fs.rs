@@ -2,95 +2,95 @@ use crate::fs::*;
 use futures_lite::Stream;
 
 impl Fs for crate::runtime::Smol {
-    type File = async_fs::File;
-    type DirEntry = async_fs::DirEntry;
+    type File = smol::fs::File;
+    type DirEntry = smol::fs::DirEntry;
 
     fn canonicalize(
         path: impl AsRef<std::path::Path>,
     ) -> impl Future<Output = std::io::Result<std::path::PathBuf>> {
-        async_fs::canonicalize(path)
+        smol::fs::canonicalize(path)
     }
     fn copy(
         from: impl AsRef<std::path::Path>,
         to: impl AsRef<std::path::Path>,
     ) -> impl Future<Output = std::io::Result<u64>> {
-        async_fs::copy(from, to)
+        smol::fs::copy(from, to)
     }
     fn create_dir(path: impl AsRef<std::path::Path>) -> impl Future<Output = std::io::Result<()>> {
-        async_fs::create_dir(path)
+        smol::fs::create_dir(path)
     }
     fn create_dir_all(
         path: impl AsRef<std::path::Path>,
     ) -> impl Future<Output = std::io::Result<()>> {
-        async_fs::create_dir_all(path)
+        smol::fs::create_dir_all(path)
     }
     fn hard_link(
         target: impl AsRef<std::path::Path>,
         link: impl AsRef<std::path::Path>,
     ) -> impl Future<Output = std::io::Result<()>> {
-        async_fs::hard_link(target, link)
+        smol::fs::hard_link(target, link)
     }
     fn metadata(
         path: impl AsRef<std::path::Path>,
     ) -> impl Future<Output = std::io::Result<std::fs::Metadata>> {
-        async_fs::metadata(path)
+        smol::fs::metadata(path)
     }
     fn read(path: impl AsRef<std::path::Path>) -> impl Future<Output = std::io::Result<Vec<u8>>> {
-        async_fs::read(path)
+        smol::fs::read(path)
     }
     fn read_dir(
         path: impl AsRef<std::path::Path>,
     ) -> impl Future<Output = std::io::Result<impl Stream<Item = std::io::Result<Self::DirEntry>>>>
     {
-        async_fs::read_dir(path)
+        smol::fs::read_dir(path)
     }
     fn read_link(
         path: impl AsRef<std::path::Path>,
     ) -> impl Future<Output = std::io::Result<std::path::PathBuf>> {
-        async_fs::read_link(path)
+        smol::fs::read_link(path)
     }
     fn read_to_string(
         path: impl AsRef<std::path::Path>,
     ) -> impl Future<Output = std::io::Result<String>> {
-        async_fs::read_to_string(path)
+        smol::fs::read_to_string(path)
     }
     fn remove_dir(path: impl AsRef<std::path::Path>) -> impl Future<Output = std::io::Result<()>> {
-        async_fs::remove_dir(path)
+        smol::fs::remove_dir(path)
     }
     fn remove_dir_all(
         path: impl AsRef<std::path::Path>,
     ) -> impl Future<Output = std::io::Result<()>> {
-        async_fs::remove_dir_all(path)
+        smol::fs::remove_dir_all(path)
     }
     fn remove_file(path: impl AsRef<std::path::Path>) -> impl Future<Output = std::io::Result<()>> {
-        async_fs::remove_file(path)
+        smol::fs::remove_file(path)
     }
     fn rename(
         from: impl AsRef<std::path::Path>,
         to: impl AsRef<std::path::Path>,
     ) -> impl Future<Output = std::io::Result<()>> {
-        async_fs::rename(from, to)
+        smol::fs::rename(from, to)
     }
     fn set_permissions(
         path: impl AsRef<std::path::Path>,
         perm: std::fs::Permissions,
     ) -> impl Future<Output = std::io::Result<()>> {
-        async_fs::set_permissions(path, perm)
+        smol::fs::set_permissions(path, perm)
     }
     fn symlink_metadata(
         path: impl AsRef<std::path::Path>,
     ) -> impl Future<Output = std::io::Result<std::fs::Metadata>> {
-        async_fs::symlink_metadata(path)
+        smol::fs::symlink_metadata(path)
     }
     fn write(
         path: impl AsRef<std::path::Path>,
         contents: impl AsRef<[u8]>,
     ) -> impl Future<Output = std::io::Result<()>> {
-        async_fs::write(path, contents)
+        smol::fs::write(path, contents)
     }
 }
 
-impl DirEntry for async_fs::DirEntry {
+impl DirEntry for smol::fs::DirEntry {
     fn file_name(&self) -> std::ffi::OsString {
         self.file_name()
     }
@@ -105,23 +105,23 @@ impl DirEntry for async_fs::DirEntry {
     }
 }
 
-impl File for async_fs::File {
-    type OpenOptions = async_fs::OpenOptions;
+impl File for smol::fs::File {
+    type OpenOptions = smol::fs::OpenOptions;
 
     fn create(path: impl AsRef<std::path::Path>) -> impl Future<Output = std::io::Result<Self>> {
-        async_fs::File::create(path)
+        smol::fs::File::create(path)
     }
     fn create_new(
         path: impl AsRef<std::path::Path>,
     ) -> impl Future<Output = std::io::Result<Self>> {
-        async_fs::OpenOptions::new()
+        smol::fs::OpenOptions::new()
             .read(true)
             .write(true)
             .create_new(true)
             .open(path)
     }
     fn open(path: impl AsRef<std::path::Path>) -> impl Future<Output = std::io::Result<Self>> {
-        async_fs::File::open(path)
+        smol::fs::File::open(path)
     }
     fn set_len(&self, len: u64) -> impl Future<Output = std::io::Result<()>> {
         self.set_len(len)
@@ -143,7 +143,7 @@ impl File for async_fs::File {
     }
 }
 
-impl OpenOptions for async_fs::OpenOptions {
+impl OpenOptions for smol::fs::OpenOptions {
     fn new() -> Self {
         Self::new()
     }
