@@ -1,6 +1,6 @@
 //! TCP/UDP networking.
 
-use futures_lite::{AsyncRead, AsyncWrite};
+use futures_io::{AsyncRead, AsyncWrite};
 use std::{
     io::Result,
     net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},

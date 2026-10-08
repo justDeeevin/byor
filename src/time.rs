@@ -1,6 +1,6 @@
 //! Asynchronous timing.
 
-use futures_lite::Stream;
+use futures_core::Stream;
 use std::time::{Duration, Instant};
 
 pub trait Time {

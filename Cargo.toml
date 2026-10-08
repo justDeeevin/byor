@@ -1,6 +1,6 @@
 [package]
 name = "byor"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2024"
 authors = ["Devin Droddy <devin@justdeeevin.dev"]
 license = "MIT"
@@ -17,11 +17,11 @@ categories = [
 ]
 
 [dependencies]
-futures-lite = { version = "2.6.1", default-features = false, features = [
-  "std",
-], optional = true }
+futures-core = { version = "0.3.34", optional = true }
+futures-io = { version = "0.3.34", optional = true }
+futures-util = { version = "0.3.34", optional = true }
 
-tokio = { version = "1.50.0", optional = true, features = [
+tokio = { version = "1.53.2", optional = true, features = [
   "sync",
   "rt-multi-thread",
   "rt",
@@ -30,18 +30,18 @@ tokio = { version = "1.50.0", optional = true, features = [
   "net",
   "process",
 ] }
-tokio-util = { version = "0.7.18", default-features = false, optional = true, features = [
+tokio-util = { version = "0.7.19", default-features = false, optional = true, features = [
   "rt",
   "compat",
 ] }
-tokio-stream = { version = "0.1.18", default-features = false, optional = true, features = [
+tokio-stream = { version = "0.1.19", default-features = false, optional = true, features = [
   "sync",
   "fs",
   "time",
   "net",
 ] }
 
-futures = { version = "0.3.32", default-features = false, optional = true, features = [
+futures = { version = "0.3.34", default-features = false, optional = true, features = [
   "thread-pool",
   "executor",
 ] }
@@ -52,15 +52,15 @@ smol = { version = "2.0.2", optional = true }
 default = ["full"]
 
 smol = ["dep:smol"]
-tokio = ["dep:tokio", "dep:tokio-stream", "dep:tokio-util"]
+tokio = ["dep:tokio", "dep:tokio-stream", "dep:tokio-util", "dep:futures-util"]
 futures = ["dep:futures"]
 
 full = ["lock", "channel", "exec", "fs", "time", "net", "process"]
 lock = []
-channel = ["dep:futures-lite"]
+channel = ["dep:futures-core"]
 exec = []
 local-exec = []
-fs = ["dep:futures-lite"]
-time = []
-net = []
-process = ["dep:futures-lite"]
+fs = ["dep:futures-core", "dep:futures-io"]
+time = ["dep:futures-core"]
+net = ["dep:futures-io"]
+process = ["dep:futures-core", "dep:futures-io"]

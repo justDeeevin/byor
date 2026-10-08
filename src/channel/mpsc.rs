@@ -1,8 +1,7 @@
 //! A multi-producer, single-consumer queue for sending values between asynchronous tasks.
 
+use futures_core::Stream;
 use std::error::Error;
-
-use futures_lite::Stream;
 
 /// Base sender behavior for both unbounded and bounded channels.
 pub trait Sender<T: 'static>: Clone {

@@ -1,5 +1,5 @@
 use crate::fs::*;
-use futures_lite::Stream;
+use futures_core::Stream;
 use tokio_util::compat::{Compat, TokioAsyncReadCompatExt};
 
 impl Fs for crate::runtime::Tokio {

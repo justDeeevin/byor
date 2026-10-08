@@ -1,6 +1,6 @@
 //! Asynchronous child process management.
 
-use futures_lite::{AsyncRead, AsyncWrite};
+use futures_io::{AsyncRead, AsyncWrite};
 use std::{
     ffi::OsStr,
     io::Result,

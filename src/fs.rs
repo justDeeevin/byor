@@ -3,7 +3,8 @@
 //! This is essentially an async-compatible copy of the [`std::fs`] module. See the documentation
 //! there for more details.
 
-use futures_lite::{AsyncRead, AsyncSeek, AsyncWrite, Stream};
+use futures_core::Stream;
+use futures_io::{AsyncRead, AsyncSeek, AsyncWrite};
 use std::{
     ffi::OsString,
     fs::{FileType, Metadata, Permissions},
@@ -144,8 +145,8 @@ pub trait DirEntry {
 /// handled.
 ///
 /// `File` does not buffer reads and writes. For efficiency, consider using a
-/// [`BufReader`](futures_lite::io::BufReader) or [`BufWriter`](futures_lite::io::BufWriter) when performing many
-/// small read or write calls, unless unbuffered reads and writes are required.
+/// BufReader or BufWriter when performing many small read or write calls, unless unbuffered
+/// reads and writes are required.
 pub trait File: AsRawFd + AsyncRead + AsyncWrite + AsyncSeek + Sized {
     type OpenOptions: OpenOptions;
 
