@@ -1,8 +1,15 @@
-use crate::fd::Fd;
+use crate::fd::{Fd, RuntimeFd};
 use smol::Async;
-use std::{io::Result, os::fd::AsFd};
+use std::{
+    io::Result,
+    os::fd::{AsFd, AsRawFd},
+};
 
-impl<T: AsFd> Fd<T> for Async<T> {
+impl RuntimeFd for crate::runtime::Smol {
+    type Fd<T: AsFd + AsRawFd> = Async<T>;
+}
+
+impl<T: AsFd + AsRawFd> Fd<T> for Async<T> {
     fn new(inner: T) -> Result<Self> {
         Async::new_nonblocking(inner)
     }

@@ -13,7 +13,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
-pub trait Fs {
+/// A runtime with filesystem operations.
+pub trait RuntimeFs {
     /// The file struct associated with this runtime.
     type File: File;
 

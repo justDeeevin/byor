@@ -2,7 +2,7 @@ use crate::fs::*;
 use futures_core::Stream;
 use tokio_util::compat::{Compat, TokioAsyncReadCompatExt};
 
-impl Fs for crate::runtime::Tokio {
+impl RuntimeFs for crate::runtime::Tokio {
     type File = Compat<tokio::fs::File>;
     type DirEntry = tokio::fs::DirEntry;
 

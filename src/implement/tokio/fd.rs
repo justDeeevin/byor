@@ -1,6 +1,10 @@
-use crate::fd::Fd;
+use crate::fd::{Fd, RuntimeFd};
 use std::os::fd::{AsFd, AsRawFd};
 use tokio::io::{Interest, unix::AsyncFd};
+
+impl RuntimeFd for crate::runtime::Tokio {
+    type Fd<T: AsFd + AsRawFd> = AsyncFd<T>;
+}
 
 impl<T: AsFd + AsRawFd> Fd<T> for AsyncFd<T> {
     fn new(inner: T) -> std::io::Result<Self> {

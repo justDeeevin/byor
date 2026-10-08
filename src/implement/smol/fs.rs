@@ -1,7 +1,7 @@
 use crate::fs::*;
 use futures_core::Stream;
 
-impl Fs for crate::runtime::Smol {
+impl RuntimeFs for crate::runtime::Smol {
     type File = smol::fs::File;
     type DirEntry = smol::fs::DirEntry;
 

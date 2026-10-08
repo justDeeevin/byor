@@ -9,6 +9,11 @@ use std::{
     process::{ExitStatus, Output, Stdio},
 };
 
+/// A runtime with process management.
+pub trait RuntimeProcess {
+    type Command: Command;
+}
+
 /// A builder for spawning child processes.
 pub trait Command {
     type Child: Child;
