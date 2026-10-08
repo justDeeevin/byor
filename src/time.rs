@@ -1,4 +1,4 @@
-//! Asynchronous timing.
+//! Timing.
 
 use futures_core::Stream;
 use std::time::{Duration, Instant};

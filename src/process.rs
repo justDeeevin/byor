@@ -1,4 +1,4 @@
-//! Asynchronous child process management.
+//! Child process management.
 
 use futures_io::{AsyncRead, AsyncWrite};
 use std::{

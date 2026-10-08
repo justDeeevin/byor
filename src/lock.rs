@@ -1,6 +1,6 @@
 #![cfg_attr(not(feature = "tokio"), allow(rustdoc::broken_intra_doc_links))]
 
-//! Async synchronization primitives.
+//! Synchronization primitives.
 //!
 //! In general, using [`std::sync`] is preferred over their async counterparts. You should only
 //! reach for these when a lock needs to be held across an await point (clippy will warn you in

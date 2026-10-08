@@ -10,6 +10,9 @@ mod channel;
 #[cfg(feature = "fs")]
 mod fs;
 
+#[cfg(all(feature = "fd", target_family = "unix"))]
+mod fd;
+
 #[cfg(feature = "time")]
 mod time;
 

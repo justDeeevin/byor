@@ -10,6 +10,9 @@ mod executor;
 #[cfg(feature = "fs")]
 mod fs;
 
+#[cfg(feature = "fd")]
+mod fd;
+
 #[cfg(feature = "time")]
 mod time;
 

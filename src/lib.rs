@@ -19,6 +19,9 @@ pub mod executor;
 #[cfg(feature = "fs")]
 pub mod fs;
 
+#[cfg(feature = "fd")]
+pub mod fd;
+
 #[cfg(feature = "time")]
 pub mod time;
 
