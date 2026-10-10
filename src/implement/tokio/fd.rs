@@ -8,7 +8,9 @@ impl RuntimeFd for crate::runtime::Tokio {
 
 impl<T: AsFd + AsRawFd> Fd<T> for AsyncFd<T> {
     fn new(inner: T) -> std::io::Result<Self> {
-        AsyncFd::new(inner)
+        // SAFETY: T implements AsFd, which means that its AsRawFd implementation
+        // always satisfies AsyncFd's requirements.
+        unsafe { AsyncFd::register(inner) }.map_err(|e| e.into_parts().1)
     }
     unsafe fn get_mut(&mut self) -> &mut T {
         self.get_mut()
@@ -20,16 +22,18 @@ impl<T: AsFd + AsRawFd> Fd<T> for AsyncFd<T> {
         Ok(self.into_inner())
     }
     fn poll_readable(&self, cx: &mut std::task::Context) -> std::task::Poll<std::io::Result<()>> {
-        self.poll_read_ready(cx).map(|r| r.map(|_| ()))
+        self.poll_read_ready(cx)
+            .map(|r| r.map(|mut guard| guard.clear_ready()))
     }
     fn poll_writable(&self, cx: &mut std::task::Context) -> std::task::Poll<std::io::Result<()>> {
-        self.poll_write_ready(cx).map(|r| r.map(|_| ()))
+        self.poll_write_ready(cx)
+            .map(|r| r.map(|mut guard| guard.clear_ready()))
     }
     async fn readable(&self) -> std::io::Result<()> {
-        self.readable().await.map(|_| ())
+        self.readable().await.map(|mut guard| guard.clear_ready())
     }
     async fn writable(&self) -> std::io::Result<()> {
-        self.writable().await.map(|_| ())
+        self.writable().await.map(|mut guard| guard.clear_ready())
     }
     fn read_with<R>(
         &self,

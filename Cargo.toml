@@ -1,6 +1,6 @@
 [package]
 name = "byor"
-version = "2.0.0"
+version = "2.0.1"
 edition = "2024"
 authors = ["Devin Droddy <devin@justdeeevin.dev"]
 license = "MIT"
@@ -21,7 +21,7 @@ futures-core = { version = "0.3.34", optional = true }
 futures-io = { version = "0.3.34", optional = true }
 futures-util = { version = "0.3.34", optional = true }
 
-tokio = { version = "1.53.2", optional = true, features = [
+tokio = { version = "1.53.3", optional = true, features = [
   "sync",
   "rt-multi-thread",
   "rt",
@@ -30,7 +30,7 @@ tokio = { version = "1.53.2", optional = true, features = [
   "net",
   "process",
 ] }
-tokio-util = { version = "0.7.19", default-features = false, optional = true, features = [
+tokio-util = { version = "0.7.20", default-features = false, optional = true, features = [
   "rt",
   "compat",
 ] }
