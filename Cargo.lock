@@ -154,7 +154,7 @@ dependencies = [
 
 [[package]]
 name = "byor"
-version = "2.0.0"
+version = "2.0.1"
 dependencies = [
  "futures",
  "futures-core",
