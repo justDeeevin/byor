@@ -19,7 +19,16 @@ pub mod executor;
 #[cfg(feature = "fs")]
 pub mod fs;
 
-#[cfg(feature = "fd")]
+#[cfg(all(
+    feature = "fd",
+    any(
+        unix,
+        target_os = "hermit",
+        target_os = "trusty",
+        target_os = "wasi",
+        target_os = "motor"
+    )
+))]
 pub mod fd;
 
 #[cfg(feature = "time")]

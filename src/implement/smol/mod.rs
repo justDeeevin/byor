@@ -10,7 +10,16 @@ mod executor;
 #[cfg(feature = "fs")]
 mod fs;
 
-#[cfg(feature = "fd")]
+#[cfg(all(
+    feature = "fd",
+    any(
+        unix,
+        target_os = "hermit",
+        target_os = "trusty",
+        target_os = "wasi",
+        target_os = "motor"
+    )
+))]
 mod fd;
 
 #[cfg(feature = "time")]
