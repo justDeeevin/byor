@@ -4,16 +4,16 @@
 
 use std::{
     io::Result,
-    os::fd::{AsFd, AsRawFd},
+    os::fd::AsFd,
     task::{Context, Poll},
 };
 
 /// A runtime with a file descriptor implementation.
 pub trait RuntimeFd {
-    type Fd<T: AsFd + AsRawFd>: Fd<T>;
+    type Fd<T: AsFd>: Fd<T>;
 }
 
-pub trait Fd<T: AsFd + AsRawFd>: AsFd + AsRawFd + Sized {
+pub trait Fd<T: AsFd>: AsFd + Sized {
     /// Create a new file descriptor from the given I/O handle.
     ///
     /// <div class="warning">The given resource must have already been put into non-blocking
