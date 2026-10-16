@@ -72,7 +72,7 @@ pub trait Command {
     /// Sets the working directory for the child process.
     ///
     /// # Platform-specific behavior
-    /// If the program path is relative (e.g., `"./script.sh"`), it’s ambiguous whether it should be interpreted relative to the parent’s working directory or relative to `current_dir`. The behavior in this case is platform specific and unstable, and it’s recommended to use [`canonicalize`](super::fs::Fs::canonicalize) to get an absolute program path instead.
+    /// If the program path is relative (e.g., `"./script.sh"`), it’s ambiguous whether it should be interpreted relative to the parent’s working directory or relative to `current_dir`. The behavior in this case is platform specific and unstable, and it’s recommended to use [`canonicalize`](super::fs::RuntimeFs::canonicalize) to get an absolute program path instead.
     fn current_dir(&mut self, dir: impl AsRef<Path>) -> &mut Self;
 
     /// Configures the child process's standard input (stdin) handle.

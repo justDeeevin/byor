@@ -53,7 +53,7 @@ pub trait RuntimeFs {
     /// Given a path, queries the file system to get information about a file, directory, etc.
     ///
     /// This function will traverse symbolic links to query information about their targets. **If
-    /// you wish to query information about a link itself, use [`symlink_metadata`](Fs::symlink_metadata)** instead.
+    /// you wish to query information about a link itself, use [`symlink_metadata`](RuntimeFs::symlink_metadata)** instead.
     fn metadata(path: impl AsRef<Path>) -> impl Future<Output = Result<Metadata>>;
 
     /// Reads the entire contents of a file into a bytes vector.
@@ -75,7 +75,7 @@ pub trait RuntimeFs {
     /// Removes an **empty** directory.
     ///
     /// If you want to remove a non-empty directory as well as all of its contents recursively, use
-    /// [`remove_dir_all`](Fs::remove_dir_all) instead.
+    /// [`remove_dir_all`](RuntimeFs::remove_dir_all) instead.
     fn remove_dir(path: impl AsRef<Path>) -> impl Future<Output = Result<()>>;
 
     /// Removes a directory after recursively removing all of its contents. **Use carefully!**
@@ -117,7 +117,7 @@ pub trait RuntimeFs {
     ) -> impl Future<Output = Result<()>>;
 }
 
-/// An entry returned by [`read_dir`](Fs::read_dir).
+/// An entry returned by [`read_dir`](RuntimeFs::read_dir).
 pub trait DirEntry {
     /// Returns the file name of this directory entry without any leading path components.
     fn file_name(&self) -> OsString;
@@ -129,7 +129,7 @@ pub trait DirEntry {
 
     /// Returns the metadata for the file at which this entry points.
     ///
-    /// This will not traverse symlinks. To do so, use [`Fs::metadata`] or [`File::metadata`].
+    /// This will not traverse symlinks. To do so, use [`RuntimeFs::metadata`] or [`File::metadata`].
     fn metadata(&self) -> impl Future<Output = Result<Metadata>>;
 
     /// Returns the full path to the file that this entry represents.
@@ -166,8 +166,8 @@ pub trait File: AsRawFd + AsyncRead + AsyncWrite + AsyncSeek + Sized {
 
     /// Opens a file in read-only mode.
     ///
-    /// If you only need to read the entire file contents, consider using [`Fs::read`] or
-    /// [`Fs::read_to_string`] instead.
+    /// If you only need to read the entire file contents, consider using [`RuntimeFs::read`] or
+    /// [`RuntimeFs::read_to_string`] instead.
     fn open(path: impl AsRef<Path>) -> impl Future<Output = Result<Self>>;
 
     /// Truncates or extends the underlying file, updating the size of this file to become `size`.
