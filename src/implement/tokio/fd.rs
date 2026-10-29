@@ -22,7 +22,9 @@ impl<T: AsFd> AsFd for TokioFd<T> {
     }
 }
 
-impl<T: AsFd> Fd<T> for TokioFd<T> {
+impl<T: AsFd> Fd for TokioFd<T> {
+    type Inner = T;
+
     fn new(inner: T) -> std::io::Result<Self> {
         // SAFETY: T implements AsFd, which means that its AsRawFd implementation
         // always satisfies AsyncFd's requirements.
@@ -74,7 +76,7 @@ impl<T: AsFd> Fd<T> for TokioFd<T> {
     ) -> impl Future<Output = std::io::Result<R>> {
         self.0.async_io(Interest::WRITABLE, move |wrap| op(&wrap.0))
     }
-    fn write_with_mut<R>(
+    unsafe fn write_with_mut<R>(
         &mut self,
         mut op: impl FnMut(&mut T) -> std::io::Result<R>,
     ) -> impl Future<Output = std::io::Result<R>> {

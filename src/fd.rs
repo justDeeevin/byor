@@ -10,15 +10,17 @@ use std::{
 
 /// A runtime with a file descriptor implementation.
 pub trait RuntimeFd {
-    type Fd<T: AsFd>: Fd<T>;
+    type Fd<T: AsFd>: Fd<Inner = T>;
 }
 
-pub trait Fd<T: AsFd>: AsFd + Sized {
+pub trait Fd: AsFd + Sized {
+    type Inner: AsFd;
+
     /// Create a new file descriptor from the given I/O handle.
     ///
     /// <div class="warning">The given resource must have already been put into non-blocking
     /// mode.</div>
-    fn new(inner: T) -> Result<Self>;
+    fn new(inner: Self::Inner) -> Result<Self>;
     /// Get a mutable reference to the inner I/O handle.
     ///
     /// # Safety
@@ -30,11 +32,11 @@ pub trait Fd<T: AsFd>: AsFd + Sized {
     /// condition is still dangerous with tokio, but it is guaranteed to not be undefined. Whether
     /// this is the case with smol is unclear. Since it is extremely ill-advised to drop the handle
     /// with tokio as well, this abstract method is marked unsafe.
-    unsafe fn get_mut(&mut self) -> &mut T;
+    unsafe fn get_mut(&mut self) -> &mut Self::Inner;
     /// Get a reference to the inner I/O handle.
-    fn get_ref(&self) -> &T;
+    fn get_ref(&self) -> &Self::Inner;
     /// Unwrap the inner I/O handle.
-    fn into_inner(self) -> Result<T>;
+    fn into_inner(self) -> Result<Self::Inner>;
 
     /// Poll for read readiness.
     ///
@@ -59,7 +61,10 @@ pub trait Fd<T: AsFd>: AsFd + Sized {
     /// Since file descriptors may be spuriously marked read-ready, the closure will be called in a
     /// loop until it returns something other than a [`WouldBlock`](std::io::ErrorKind::WouldBlock)
     /// error.
-    fn read_with<R>(&self, op: impl FnMut(&T) -> Result<R>) -> impl Future<Output = Result<R>>;
+    fn read_with<R>(
+        &self,
+        op: impl FnMut(&Self::Inner) -> Result<R>,
+    ) -> impl Future<Output = Result<R>>;
     /// Same as [`read_with`](Fd::read_with), but with mutable access to the inner I/O handle.
     ///
     /// # Safety
@@ -69,7 +74,7 @@ pub trait Fd<T: AsFd>: AsFd + Sized {
     /// See [`get_mut`](Fd::get_mut) for more information.
     unsafe fn read_with_mut<R>(
         &mut self,
-        op: impl FnMut(&mut T) -> Result<R>,
+        op: impl FnMut(&mut Self::Inner) -> Result<R>,
     ) -> impl Future<Output = Result<R>>;
 
     /// Runs the user-provided I/O operation after waiting for write readiness.
@@ -77,7 +82,10 @@ pub trait Fd<T: AsFd>: AsFd + Sized {
     /// Since file descriptors may be spuriously marked write-ready, the closure will be called in a
     /// loop until it returns something other than a [`WouldBlock`](std::io::ErrorKind::WouldBlock)
     /// error.
-    fn write_with<R>(&self, op: impl FnMut(&T) -> Result<R>) -> impl Future<Output = Result<R>>;
+    fn write_with<R>(
+        &self,
+        op: impl FnMut(&Self::Inner) -> Result<R>,
+    ) -> impl Future<Output = Result<R>>;
     /// Same as [`write_with`](Fd::write_with), but with mutable access to the inner I/O handle.
     ///
     /// # Safety
@@ -85,8 +93,8 @@ pub trait Fd<T: AsFd>: AsFd + Sized {
     /// The underlying I/O source must not be dropped using the returned handle.
     ///
     /// See [`get_mut`](Fd::get_mut) for more information.
-    fn write_with_mut<R>(
+    unsafe fn write_with_mut<R>(
         &mut self,
-        op: impl FnMut(&mut T) -> Result<R>,
+        op: impl FnMut(&mut Self::Inner) -> Result<R>,
     ) -> impl Future<Output = Result<R>>;
 }

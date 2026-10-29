@@ -6,7 +6,9 @@ impl RuntimeFd for crate::runtime::Smol {
     type Fd<T: AsFd> = Async<T>;
 }
 
-impl<T: AsFd> Fd<T> for Async<T> {
+impl<T: AsFd> Fd for Async<T> {
+    type Inner = T;
+
     fn new(inner: T) -> Result<Self> {
         Async::new_nonblocking(inner)
     }
@@ -54,7 +56,7 @@ impl<T: AsFd> Fd<T> for Async<T> {
         self.write_with(op)
     }
 
-    fn write_with_mut<R>(
+    unsafe fn write_with_mut<R>(
         &mut self,
         op: impl FnMut(&mut T) -> Result<R>,
     ) -> impl Future<Output = Result<R>> {
