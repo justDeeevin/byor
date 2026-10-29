@@ -1,7 +1,7 @@
 use crate::{executor::*, runtime::Smol};
 
 impl Executor for smol::Executor<'_> {
-    type Handle<T: 'static> = smol::Task<T>;
+    type Handle<T: Send + 'static> = smol::Task<T>;
 
     fn spawn<T: Send + 'static>(
         &self,

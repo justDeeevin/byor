@@ -2,7 +2,7 @@ use crate::{executor::*, runtime::Tokio};
 use tokio_util::task::AbortOnDropHandle;
 
 impl Executor for tokio::runtime::Runtime {
-    type Handle<T: 'static> = AbortOnDropHandle<T>;
+    type Handle<T: Send + 'static> = AbortOnDropHandle<T>;
 
     fn spawn<T: Send + 'static>(
         &self,

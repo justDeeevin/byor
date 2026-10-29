@@ -1,7 +1,7 @@
 use crate::{executor::*, runtime::Futures};
 
 impl Executor for futures::executor::ThreadPool {
-    type Handle<T: 'static> = futures::future::RemoteHandle<T>;
+    type Handle<T: Send + 'static> = futures::future::RemoteHandle<T>;
 
     fn spawn<T: Send + 'static>(
         &self,
