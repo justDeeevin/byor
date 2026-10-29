@@ -201,7 +201,7 @@ pub trait Child {
     /// The stdin handle to the child process, if any, will be dropped before waiting. This
     /// helps avoid deadlock; it ensures that the child does not block waiting for input from
     /// the parent while the parent waits for the child to exit.
-    fn status(&mut self) -> impl Future<Output = Result<ExitStatus>>;
+    fn status(&mut self) -> impl Future<Output = Result<ExitStatus>> + Send;
 
     /// Waits for the child to exit and collects its output.
     ///

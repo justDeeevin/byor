@@ -135,7 +135,7 @@ impl Child for tokio::process::Child {
         self.try_wait()
     }
 
-    fn status(&mut self) -> impl Future<Output = Result<ExitStatus>> {
+    fn status(&mut self) -> impl Future<Output = Result<ExitStatus>> + Send {
         self.wait()
     }
 

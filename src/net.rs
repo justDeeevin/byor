@@ -96,7 +96,7 @@ impl<T: ToSocketAddrs> ToSocketAddrs for &T {
 /// [`connect`](TcpStream::connect) or by accepting a connection from a [listener](TcpListener).
 pub trait TcpStream: AsyncRead + AsyncWrite + AsRawFd + Sized {
     /// Opens a TCP connection to a remote host.
-    fn connect(addr: impl ToSocketAddrs) -> impl Future<Output = Result<Self>>;
+    fn connect(addr: impl ToSocketAddrs + Send) -> impl Future<Output = Result<Self>> + Send;
     ///
     /// Returns the local address to which this stream is bound.
     fn local_addr(&self) -> Result<SocketAddr>;

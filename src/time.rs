@@ -5,7 +5,7 @@ use std::time::{Duration, Instant};
 
 pub trait Time {
     /// Sleep for the specified duration, returning the instant when the sleep is complete.
-    fn sleep(duration: Duration) -> impl Future<Output = Instant>;
+    fn sleep(duration: Duration) -> impl Future<Output = Instant> + Send;
 
     /// Sleep until the specified instant, returning the instant when the sleep is complete.
     fn sleep_until(deadline: Instant) -> impl Future<Output = Instant>;

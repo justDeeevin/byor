@@ -134,7 +134,7 @@ impl Child for smol::process::Child {
         self.try_status()
     }
 
-    fn status(&mut self) -> impl Future<Output = Result<ExitStatus>> {
+    fn status(&mut self) -> impl Future<Output = Result<ExitStatus>> + Send {
         self.status()
     }
 

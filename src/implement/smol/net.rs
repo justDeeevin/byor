@@ -5,7 +5,7 @@ use std::{
 };
 
 impl TcpStream for smol::net::TcpStream {
-    async fn connect(addr: impl ToSocketAddrs) -> Result<Self> {
+    async fn connect(addr: impl ToSocketAddrs + Send) -> Result<Self> {
         smol::net::TcpStream::connect(Smol::get_socket_addrs(addr.kind()).await?.as_slice()).await
     }
     fn local_addr(&self) -> Result<SocketAddr> {
