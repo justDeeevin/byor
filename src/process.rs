@@ -15,7 +15,7 @@ pub trait RuntimeProcess {
 }
 
 /// A builder for spawning child processes.
-pub trait Command {
+pub trait Command: From<std::process::Command> {
     type Child: Child;
 
     /// Constructs a new command for launching the program at the given path with the following
