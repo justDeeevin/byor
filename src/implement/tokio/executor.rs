@@ -22,11 +22,15 @@ impl Executor for tokio::runtime::Runtime {
     }
 }
 
-impl<T: 'static> Handle<T> for AbortOnDropHandle<T> {
-    type Wrap<U> = Result<U, tokio::task::JoinError>;
+impl<T: 'static> Handle for AbortOnDropHandle<T> {
+    type Out = T;
 
     fn detach(self) {
         self.detach();
+    }
+
+    fn io_result(out: Self::Output) -> std::io::Result<T> {
+        out.map_err(Into::into)
     }
 }
 

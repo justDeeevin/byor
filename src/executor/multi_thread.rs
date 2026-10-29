@@ -1,6 +1,6 @@
 /// A multi-threaded task executor that can spawn futures to be run concurrently.
 pub trait Executor: Sized {
-    type Handle<T: 'static>: super::Handle<T>;
+    type Handle<T: 'static>: super::Handle<Out = T>;
 
     /// Spawn a future to be run by the executor.
     ///
