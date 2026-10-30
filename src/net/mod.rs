@@ -10,8 +10,6 @@ use std::{
 #[cfg(unix)]
 pub mod unix;
 
-// TODO: require TryFrom impls for std network types?
-
 /// A type that can be converted to [`SocketAddr`]s.
 pub enum SocketAddrsKind<'a> {
     Slice(&'a [SocketAddr]),
@@ -94,7 +92,12 @@ impl<T: ToSocketAddrs> ToSocketAddrs for &T {
 ///
 /// A TCP stream can either be created by connecting to an endpoint with
 /// [`connect`](TcpStream::connect) or by accepting a connection from a [listener](TcpListener).
-pub trait TcpStream: AsyncRead + AsyncWrite + AsRawFd + Sized {
+pub trait TcpStream: AsyncRead + AsyncWrite + AsRawFd + Sized
+// This can't require TryFrom<std::net::UnixStream> because Compat doesn't
+// implement it
+//
+// I hate you tokio
+{
     /// Opens a TCP connection to a remote host.
     fn connect(addr: impl ToSocketAddrs) -> impl Future<Output = Result<Self>>;
     ///
@@ -134,7 +137,9 @@ pub trait TcpStream: AsyncRead + AsyncWrite + AsRawFd + Sized {
 /// A TCP socket server, listening for connections.
 ///
 /// You can accept a new connection with [`accept`](TcpListener::accept).
-pub trait TcpListener: AsFd + AsRawFd + Sized {
+pub trait TcpListener:
+    AsFd + AsRawFd + TryFrom<std::net::TcpListener, Error = std::io::Error>
+{
     /// Accepts a new incoming connection.
     ///
     /// This function will yield once a new TCP connection is established. When established,
@@ -169,7 +174,7 @@ pub trait TcpListener: AsFd + AsRawFd + Sized {
 /// - one to one: [`connect`](UdpSocket::connect) and associate with a single address, using
 ///   [`send`](UdpSocket::send) and [`recv`](UdpSocket::recv) to communicate only with that remote
 ///   address
-pub trait UdpSocket: AsFd + AsRawFd + Sized {
+pub trait UdpSocket: AsFd + AsRawFd + TryFrom<std::net::UdpSocket, Error = std::io::Error> {
     /// Creates a new UDP socket bound to `addr`.
     ///
     /// Binding to port 0 will request that the OS assigns a port. The result can be queried

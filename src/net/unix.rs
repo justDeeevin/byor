@@ -19,7 +19,10 @@ pub trait RuntimeUnixSocket {
 }
 
 /// A Unix connection.
-pub trait UnixStream: AsRawFd + AsyncRead + AsyncWrite + Sized {
+pub trait UnixStream: AsRawFd + AsyncRead + AsyncWrite + Sized
+// This can't require TryFrom<std::os::unix::net::UnixStream> because Compat
+// doesn't implement it
+{
     /// Creates a Unix connection to the given path.
     fn connect(path: impl AsRef<Path>) -> impl Future<Output = Result<Self>>;
 
@@ -39,7 +42,9 @@ pub trait UnixStream: AsRawFd + AsyncRead + AsyncWrite + Sized {
 }
 
 /// A Unix socket which can accept connections from other Unix sockets.
-pub trait UnixListener: AsFd + AsRawFd + Sized {
+pub trait UnixListener:
+    AsFd + AsRawFd + TryFrom<std::os::unix::net::UnixListener, Error = std::io::Error>
+{
     type Stream: UnixStream;
 
     /// Creates a new listener bound to the given path.
@@ -59,7 +64,9 @@ pub trait UnixListener: AsFd + AsRawFd + Sized {
 /// A Unix datagram socket.
 ///
 /// A socket can either be named (associated with a filesystem path; see [`bind`](UnixDatagram::bind)) or unnamed (see [`unbound`](UnixDatagram::unbound))
-pub trait UnixDatagram: AsRawFd + Sized {
+pub trait UnixDatagram:
+    AsRawFd + TryFrom<std::os::unix::net::UnixDatagram, Error = std::io::Error>
+{
     /// Creates a new datagram bound to the given path.
     ///
     /// <div class="warning">The file at the bound path persists after the program exits, and
