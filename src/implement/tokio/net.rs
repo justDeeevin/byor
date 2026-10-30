@@ -1,4 +1,8 @@
 use crate::{net::*, runtime::Tokio};
+#[cfg(unix)]
+use futures::{Stream, StreamExt, TryStreamExt};
+#[cfg(unix)]
+use tokio_stream::wrappers::UnixListenerStream;
 use tokio_util::compat::{Compat, TokioAsyncReadCompatExt};
 
 impl TcpStream for Compat<tokio::net::TcpStream> {
@@ -148,6 +152,52 @@ impl UdpSocket for tokio::net::UdpSocket {
     }
     fn ttl(&self) -> std::io::Result<u32> {
         self.ttl()
+    }
+}
+
+#[cfg(unix)]
+impl UnixStream for Compat<tokio::net::UnixStream> {
+    fn connect(path: impl AsRef<std::path::Path>) -> impl Future<Output = std::io::Result<Self>> {
+        use futures::TryFutureExt;
+
+        tokio::net::UnixStream::connect(path).map_ok(TokioAsyncReadCompatExt::compat)
+    }
+
+    fn pair() -> std::io::Result<(Self, Self)> {
+        tokio::net::UnixStream::pair().map(|(l, r)| (l.compat(), r.compat()))
+    }
+
+    fn local_addr(&self) -> std::io::Result<std::os::unix::net::SocketAddr> {
+        self.get_ref().local_addr().map(Into::into)
+    }
+
+    fn peer_addr(&self) -> std::io::Result<std::os::unix::net::SocketAddr> {
+        self.get_ref().peer_addr().map(Into::into)
+    }
+}
+
+#[cfg(unix)]
+impl UnixListener for UnixListenerStream {
+    type Stream = Compat<tokio::net::UnixStream>;
+
+    fn bind(path: impl AsRef<std::path::Path>) -> std::io::Result<Self> {
+        tokio::net::UnixListener::bind(path).map(Self::new)
+    }
+
+    fn accept(
+        &self,
+    ) -> impl Future<Output = std::io::Result<(Self::Stream, std::os::unix::net::SocketAddr)>> {
+        use futures::TryFutureExt;
+
+        self.as_ref().accept().map_ok(|(s, a)| (s, a.into()))
+    }
+
+    fn local_addr(&self) -> std::io::Result<std::os::unix::net::SocketAddr> {
+        self.as_ref().local_addr().map(Into::into)
+    }
+
+    fn incoming(&self) -> impl Stream<Item = std::io::Result<Self::Stream>> {
+        TryStreamExt::map_ok(self, TokioAsyncReadCompatExt::compat)
     }
 }
 

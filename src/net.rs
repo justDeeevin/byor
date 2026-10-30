@@ -1,11 +1,16 @@
 //! TCP/UDP networking.
 
+#[cfg(unix)]
+use futures::Stream;
 use futures_io::{AsyncRead, AsyncWrite};
 use std::{
     io::Result,
     net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},
     os::fd::{AsFd, AsRawFd},
+    path::Path,
 };
+
+// TODO: require TryFrom impls for std network types?
 
 /// A type that can be converted to [`SocketAddr`]s.
 pub enum SocketAddrsKind<'a> {
@@ -300,6 +305,51 @@ pub trait UdpSocket: AsFd + AsRawFd + Sized {
     ///
     /// For more information about this option, see [`set_ttl`](UdpSocket::set_ttl).
     fn ttl(&self) -> Result<u32>;
+}
+
+#[cfg(unix)]
+/// A Unix connection.
+pub trait UnixStream: AsRawFd + AsyncRead + AsyncWrite + Sized {
+    /// Creates a Unix connection to the given path.
+    fn connect(path: impl AsRef<Path>) -> impl Future<Output = Result<Self>>;
+
+    /// Creates a pair of connected Unix sockets.
+    ///
+    /// Data written to one socket will be readable by the other, and vice versa.
+    fn pair() -> Result<(Self, Self)>;
+
+    /// The socket address of the local half of this connection.
+    fn local_addr(&self) -> Result<std::os::unix::net::SocketAddr>;
+
+    /// The socket address of the remote half of this connection.
+    fn peer_addr(&self) -> Result<std::os::unix::net::SocketAddr>;
+}
+
+#[cfg(unix)]
+/// A Unix socket which can accept connections from other Unix sockets.
+pub trait UnixListener: AsFd + AsRawFd + Sized {
+    type Stream: UnixStream;
+
+    /// Creates a new listener bound to the given path.
+    fn bind(path: impl AsRef<Path>) -> Result<Self>;
+
+    /// Accepts a new incoming connection.
+    fn accept(
+        &self,
+    ) -> impl Future<Output = Result<(Self::Stream, std::os::unix::net::SocketAddr)>>;
+
+    /// The local socket address of this listener.
+    fn local_addr(&self) -> Result<std::os::unix::net::SocketAddr>;
+
+    /// A stream of incoming connections.
+    ///
+    /// This is equivalent to calling [`accept`](UnixListener::accept) in a loop.
+    fn incoming(&self) -> impl Stream<Item = Result<Self::Stream>>;
+}
+
+#[cfg(unix)]
+pub trait UnixDatagram: AsRawFd {
+    // TODO:
 }
 
 /// A runtime with networking.
