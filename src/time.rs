@@ -3,16 +3,26 @@
 use futures_core::Stream;
 use std::time::{Duration, Instant};
 
-pub trait Time {
-    /// Sleep for the specified duration, returning the instant when the sleep is complete.
-    fn sleep(duration: Duration) -> impl Future<Output = Instant>;
+/// A future that completes after a certain amount of time has passed.
+pub trait Sleep: Future<Output = ()> {
+    /// Creates a future that completes after the given duration of time.
+    fn after(duration: Duration) -> Self;
 
-    /// Sleep until the specified instant, returning the instant when the sleep is complete.
-    fn sleep_until(deadline: Instant) -> impl Future<Output = Instant>;
+    /// Creates a future that completes once the given instant is reached.
+    fn at(instant: Instant) -> Self;
+}
 
-    /// Create a stream of instants that yields with the given interval.
-    fn interval(duration: Duration) -> impl Stream<Item = Instant>;
+/// A stream of instants that yields continuously with a consistent period.
+pub trait Interval: Stream<Item = Instant> {
+    /// Creates a stream that yields with the given period starting immediately.
+    fn with_period(period: Duration) -> Self;
 
-    /// Create a stream of instants that yields with the given interval, starting at the given instant.
-    fn interval_at(start: Instant, duration: Duration) -> impl Stream<Item = Instant>;
+    /// Creates a stream that yields with the given period starting at the given instant.
+    fn starting_at(start: Instant, period: Duration) -> Self;
+}
+
+/// A runtime with timing support.
+pub trait RuntimeTime {
+    type Sleep: Sleep;
+    type Interval: Interval;
 }

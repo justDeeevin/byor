@@ -1,24 +1,29 @@
-use crate::{runtime::Tokio, time::Time};
-use futures_util::StreamExt;
+use crate::{runtime::Tokio, time::*};
+use futures_util::{StreamExt, stream::Map};
 use std::time::{Duration, Instant};
 use tokio_stream::wrappers::IntervalStream;
 
-impl Time for Tokio {
-    async fn sleep(duration: Duration) -> Instant {
-        tokio::time::sleep(duration).await;
-        Instant::now()
+impl Sleep for tokio::time::Sleep {
+    fn after(duration: Duration) -> Self {
+        tokio::time::sleep(duration)
     }
-    async fn sleep_until(deadline: Instant) -> Instant {
-        tokio::time::sleep_until(deadline.into()).await;
-        Instant::now()
+
+    fn at(instant: Instant) -> Self {
+        tokio::time::sleep_until(instant.into())
     }
-    fn interval(duration: Duration) -> impl futures_core::Stream<Item = Instant> {
-        IntervalStream::new(tokio::time::interval(duration)).map(Into::into)
+}
+
+impl Interval for Map<IntervalStream, fn(tokio::time::Instant) -> Instant> {
+    fn with_period(period: Duration) -> Self {
+        IntervalStream::new(tokio::time::interval(period)).map(Into::into)
     }
-    fn interval_at(
-        start: Instant,
-        duration: Duration,
-    ) -> impl futures_core::Stream<Item = Instant> {
-        IntervalStream::new(tokio::time::interval_at(start.into(), duration)).map(Into::into)
+
+    fn starting_at(start: Instant, period: Duration) -> Self {
+        IntervalStream::new(tokio::time::interval_at(start.into(), period)).map(Into::into)
     }
+}
+
+impl RuntimeTime for Tokio {
+    type Sleep = tokio::time::Sleep;
+    type Interval = Map<IntervalStream, fn(tokio::time::Instant) -> Instant>;
 }

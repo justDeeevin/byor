@@ -1,22 +1,29 @@
-use crate::{runtime::Smol, time::Time};
+use crate::{runtime::Smol, time::*};
+use futures_util::{FutureExt, future::Map};
 use smol::Timer;
+use std::time::Instant;
 
-impl Time for Smol {
-    fn sleep(duration: std::time::Duration) -> impl Future<Output = std::time::Instant> {
-        Timer::after(duration)
+impl Sleep for Map<Timer, fn(Instant)> {
+    fn after(duration: std::time::Duration) -> Self {
+        Timer::after(duration).map(drop)
     }
-    fn sleep_until(deadline: std::time::Instant) -> impl Future<Output = std::time::Instant> {
-        Timer::at(deadline)
+
+    fn at(instant: std::time::Instant) -> Self {
+        Timer::at(instant).map(drop)
     }
-    fn interval(
-        duration: std::time::Duration,
-    ) -> impl futures_core::Stream<Item = std::time::Instant> {
-        Timer::interval(duration)
+}
+
+impl Interval for Timer {
+    fn with_period(period: std::time::Duration) -> Self {
+        Self::interval(period)
     }
-    fn interval_at(
-        start: std::time::Instant,
-        duration: std::time::Duration,
-    ) -> impl futures_core::Stream<Item = std::time::Instant> {
-        Timer::interval_at(start, duration)
+
+    fn starting_at(start: std::time::Instant, period: std::time::Duration) -> Self {
+        Self::interval_at(start, period)
     }
+}
+
+impl RuntimeTime for Smol {
+    type Sleep = Map<Timer, fn(Instant)>;
+    type Interval = Timer;
 }
