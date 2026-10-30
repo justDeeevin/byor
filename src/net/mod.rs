@@ -1,4 +1,4 @@
-//! TCP/UDP networking.
+//! TCP/UDP/Unix communication.
 
 use futures_io::{AsyncRead, AsyncWrite};
 use std::{
@@ -6,6 +6,11 @@ use std::{
     net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},
     os::fd::{AsFd, AsRawFd},
 };
+
+#[cfg(unix)]
+pub mod unix;
+
+// TODO: require TryFrom impls for std network types?
 
 /// A type that can be converted to [`SocketAddr`]s.
 pub enum SocketAddrsKind<'a> {

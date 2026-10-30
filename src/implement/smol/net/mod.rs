@@ -4,6 +4,9 @@ use std::{
     net::{Ipv4Addr, Ipv6Addr, SocketAddr},
 };
 
+#[cfg(unix)]
+mod unix;
+
 impl TcpStream for smol::net::TcpStream {
     async fn connect(addr: impl ToSocketAddrs) -> Result<Self> {
         smol::net::TcpStream::connect(Smol::get_socket_addrs(addr.kind()).await?.as_slice()).await

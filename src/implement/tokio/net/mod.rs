@@ -1,6 +1,9 @@
 use crate::{net::*, runtime::Tokio};
 use tokio_util::compat::{Compat, TokioAsyncReadCompatExt};
 
+#[cfg(unix)]
+mod unix;
+
 impl TcpStream for Compat<tokio::net::TcpStream> {
     async fn connect(addr: impl ToSocketAddrs) -> std::io::Result<Self> {
         Ok(
