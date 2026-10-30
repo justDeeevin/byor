@@ -29,6 +29,10 @@ pub trait Command: From<std::process::Command> {
     /// If `program` is not an absolute path, the `PATH` will be searched in an OS-defined way.
     fn new(program: impl AsRef<OsStr>) -> Self;
 
+    fn new_concrete(program: &OsStr) -> Self {
+        Self::new(program)
+    }
+
     /// Adds a single argument to pass to the program.
     ///
     /// Only one argument can be passed per use. So instead of:
@@ -45,10 +49,18 @@ pub trait Command: From<std::process::Command> {
     /// To pass multiple arguments, see [`args`](Self::args).
     fn arg(&mut self, arg: impl AsRef<OsStr>) -> &mut Self;
 
+    fn arg_concrete(&mut self, arg: &OsStr) -> &mut Self {
+        self.arg(arg)
+    }
+
     /// Adds multitle arguments to pass to the program.
     ///
     /// To pass a single argument, see [`arg`](Self::arg).
     fn args(&mut self, args: impl IntoIterator<Item = impl AsRef<OsStr>>) -> &mut Self;
+
+    fn args_concrete(&mut self, args: &[&OsStr]) -> &mut Self {
+        self.args(args)
+    }
 
     /// Inserts or updates an environment variable mapping.
     ///
@@ -56,14 +68,26 @@ pub trait Command: From<std::process::Command> {
     /// Windows, and case-sensitive on all other platforms.
     fn env(&mut self, key: impl AsRef<OsStr>, val: impl AsRef<OsStr>) -> &mut Self;
 
+    fn env_concrete(&mut self, key: &OsStr, val: &OsStr) -> &mut Self {
+        self.env(key, val)
+    }
+
     /// Adds or updates multiple environment variable mappings.
     fn envs(
         &mut self,
         vars: impl IntoIterator<Item = (impl AsRef<OsStr>, impl AsRef<OsStr>)>,
     ) -> &mut Self;
 
+    fn envs_concrete(&mut self, vars: &[(&OsStr, &OsStr)]) -> &mut Self {
+        self.envs(vars.iter().copied())
+    }
+
     /// Removes an environment variable mapping.
     fn env_remove(&mut self, key: impl AsRef<OsStr>) -> &mut Self;
+
+    fn env_remove_concrete(&mut self, key: &OsStr) -> &mut Self {
+        self.env_remove(key)
+    }
 
     /// Removes all environment variable mappings.
     fn env_clear(&mut self) -> &mut Self;
@@ -75,10 +99,18 @@ pub trait Command: From<std::process::Command> {
     /// If the program path is relative (e.g., `"./script.sh"`), it’s ambiguous whether it should be interpreted relative to the parent’s working directory or relative to `current_dir`. The behavior in this case is platform specific and unstable, and it’s recommended to use [`canonicalize`](super::fs::RuntimeFs::canonicalize) to get an absolute program path instead.
     fn current_dir(&mut self, dir: impl AsRef<Path>) -> &mut Self;
 
+    fn current_dir_concrete(&mut self, dir: &Path) -> &mut Self {
+        self.current_dir(dir)
+    }
+
     /// Configures the child process's standard input (stdin) handle.
     ///
     /// Defaults to [`Stdio::inherit`]
     fn stdin(&mut self, cfg: impl Into<Stdio>) -> &mut Self;
+
+    fn stdin_concrete(&mut self, cfg: Stdio) -> &mut Self {
+        self.stdin(cfg)
+    }
 
     /// Configures the child process's standard output (stdout) handle.
     ///
@@ -87,12 +119,20 @@ pub trait Command: From<std::process::Command> {
     /// [`output`](Self::output).
     fn stdout(&mut self, cfg: impl Into<Stdio>) -> &mut Self;
 
+    fn stdout_concrete(&mut self, cfg: Stdio) -> &mut Self {
+        self.stdout(cfg)
+    }
+
     /// Configures the child process's standard error (stderr) handle.
     ///
     /// Defaults to [`Stdio::inherit`] when used with [`spawn`](Self::spawn) or
     /// [`status`](Self::status), and defaults to [`Stdio::piped`] when used with
     /// [`output`](Self::output).
     fn stderr(&mut self, cfg: impl Into<Stdio>) -> &mut Self;
+
+    fn stderr_concrete(&mut self, cfg: Stdio) -> &mut Self {
+        self.stderr(cfg)
+    }
 
     /// Configures whether to kill the process when its corresponding [`Child`] handle is dropped.
     ///
@@ -142,6 +182,10 @@ pub trait CommandExt: Command {
     /// Sets the first process argument, `argv[0]`, to something other than the default
     /// executable path.
     fn arg0(&mut self, arg0: impl AsRef<OsStr>) -> &mut Self;
+
+    fn arg0_concrete(&mut self, arg0: &OsStr) -> &mut Self {
+        self.arg0(arg0)
+    }
 }
 
 /// A spawned child process.

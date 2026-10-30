@@ -25,6 +25,10 @@ pub trait RuntimeFs {
     /// and symbolic links resolved.
     fn canonicalize(path: impl AsRef<Path>) -> impl Future<Output = Result<PathBuf>>;
 
+    fn canonicalize_concrete(path: &Path) -> impl Future<Output = Result<PathBuf>> {
+        Self::canonicalize(path)
+    }
+
     /// Copies the contents of one file to another. This function will also copy the permission
     /// bits of the original file to the destination file.
     ///
@@ -35,8 +39,16 @@ pub trait RuntimeFs {
     /// On success, the total number of bytes copied is returned and it is equal to the length of the to file as reported by metadata.
     fn copy(from: impl AsRef<Path>, to: impl AsRef<Path>) -> impl Future<Output = Result<u64>>;
 
+    fn copy_concrete(from: &Path, to: &Path) -> impl Future<Output = Result<u64>> {
+        Self::copy(from, to)
+    }
+
     /// Creates a new, empty directory at the provided path.
     fn create_dir(path: impl AsRef<Path>) -> impl Future<Output = Result<()>>;
+
+    fn create_dir_concrete(path: &Path) -> impl Future<Output = Result<()>> {
+        Self::create_dir(path)
+    }
 
     /// Recursively create a directory and all of its parent components if they are missing.
     ///
@@ -44,11 +56,19 @@ pub trait RuntimeFs {
     /// create will remain.
     fn create_dir_all(path: impl AsRef<Path>) -> impl Future<Output = Result<()>>;
 
+    fn create_dir_all_concrete(path: &Path) -> impl Future<Output = Result<()>> {
+        Self::create_dir_all(path)
+    }
+
     /// Creates a new hard link on the filesystem.
     fn hard_link(
         target: impl AsRef<Path>,
         link: impl AsRef<Path>,
     ) -> impl Future<Output = Result<()>>;
+
+    fn hard_link_concrete(target: &Path, link: &Path) -> impl Future<Output = Result<()>> {
+        Self::hard_link(target, link)
+    }
 
     /// Given a path, queries the file system to get information about a file, directory, etc.
     ///
@@ -56,8 +76,16 @@ pub trait RuntimeFs {
     /// you wish to query information about a link itself, use [`symlink_metadata`](RuntimeFs::symlink_metadata)** instead.
     fn metadata(path: impl AsRef<Path>) -> impl Future<Output = Result<Metadata>>;
 
+    fn metadata_concrete(path: &Path) -> impl Future<Output = Result<Metadata>> {
+        Self::metadata(path)
+    }
+
     /// Reads the entire contents of a file into a bytes vector.
     fn read(path: impl AsRef<Path>) -> impl Future<Output = Result<Vec<u8>>>;
+
+    fn read_concrete(path: &Path) -> impl Future<Output = Result<Vec<u8>>> {
+        Self::read(path)
+    }
 
     /// Returns a stream of the entries within a directory.
     ///
@@ -66,11 +94,25 @@ pub trait RuntimeFs {
         path: impl AsRef<Path>,
     ) -> impl Future<Output = Result<impl Stream<Item = Result<Self::DirEntry>>>>;
 
+    fn read_dir_concrete(
+        path: &Path,
+    ) -> impl Future<Output = Result<impl Stream<Item = Result<Self::DirEntry>>>> {
+        Self::read_dir(path)
+    }
+
     /// Reads a symbolic link, returning the file to which it points.
     fn read_link(path: impl AsRef<Path>) -> impl Future<Output = Result<PathBuf>>;
 
+    fn read_link_concrete(path: &Path) -> impl Future<Output = Result<PathBuf>> {
+        Self::read_link(path)
+    }
+
     /// Reads the entire contents of a file into a string.
     fn read_to_string(path: impl AsRef<Path>) -> impl Future<Output = Result<String>>;
+
+    fn read_to_string_concrete(path: &Path) -> impl Future<Output = Result<String>> {
+        Self::read_to_string(path)
+    }
 
     /// Removes an **empty** directory.
     ///
@@ -78,18 +120,34 @@ pub trait RuntimeFs {
     /// [`remove_dir_all`](RuntimeFs::remove_dir_all) instead.
     fn remove_dir(path: impl AsRef<Path>) -> impl Future<Output = Result<()>>;
 
+    fn remove_dir_concrete(path: &Path) -> impl Future<Output = Result<()>> {
+        Self::remove_dir(path)
+    }
+
     /// Removes a directory after recursively removing all of its contents. **Use carefully!**
     ///
     /// This function does **not** follow symbolic links, simply removing the links themselves.
     fn remove_dir_all(path: impl AsRef<Path>) -> impl Future<Output = Result<()>>;
 
+    fn remove_dir_all_concrete(path: &Path) -> impl Future<Output = Result<()>> {
+        Self::remove_dir_all(path)
+    }
+
     /// Removes a file from the filesystem.
     fn remove_file(path: impl AsRef<Path>) -> impl Future<Output = Result<()>>;
+
+    fn remove_file_concrete(path: &Path) -> impl Future<Output = Result<()>> {
+        Self::remove_file(path)
+    }
 
     /// Renames a file or directory, replacing any existing file or directory at the new path.
     ///
     /// This will not work if the new name is on a different storage device.
     fn rename(from: impl AsRef<Path>, to: impl AsRef<Path>) -> impl Future<Output = Result<()>>;
+
+    fn rename_concrete(from: &Path, to: &Path) -> impl Future<Output = Result<()>> {
+        Self::rename(from, to)
+    }
 
     /// Changes the permissions found on a file or directory.
     ///
@@ -105,8 +163,19 @@ pub trait RuntimeFs {
         perm: Permissions,
     ) -> impl Future<Output = Result<()>>;
 
+    fn set_permissions_concrete(
+        path: &Path,
+        perm: Permissions,
+    ) -> impl Future<Output = Result<()>> {
+        Self::set_permissions(path, perm)
+    }
+
     /// Queries the metadata about a file without following symlinks.
     fn symlink_metadata(path: impl AsRef<Path>) -> impl Future<Output = Result<Metadata>>;
+
+    fn symlink_metadata_concrete(path: &Path) -> impl Future<Output = Result<Metadata>> {
+        Self::symlink_metadata(path)
+    }
 
     /// Writes a slice as the entire contents of a file.
     ///
@@ -115,6 +184,10 @@ pub trait RuntimeFs {
         path: impl AsRef<Path>,
         contents: impl AsRef<[u8]>,
     ) -> impl Future<Output = Result<()>>;
+
+    fn write_concrete(path: &Path, contents: &[u8]) -> impl Future<Output = Result<()>> {
+        Self::write(path, contents)
+    }
 }
 
 /// An entry returned by [`read_dir`](RuntimeFs::read_dir).
@@ -156,10 +229,18 @@ pub trait File: AsRawFd + AsyncRead + AsyncWrite + AsyncSeek + Sized {
     /// Creates a file if it does not exist, and truncates it if it does.
     fn create(path: impl AsRef<Path>) -> impl Future<Output = Result<Self>>;
 
+    fn create_concrete(path: &Path) -> impl Future<Output = Result<Self>> {
+        Self::create(path)
+    }
+
     /// Opens a file in read-write mode.
     ///
     /// Creates a file if it does not exist, or returns an error if it does.
     fn create_new(path: impl AsRef<Path>) -> impl Future<Output = Result<Self>>;
+
+    fn create_new_concrete(path: &Path) -> impl Future<Output = Result<Self>> {
+        Self::create_new(path)
+    }
 
     /// Queries metadata about the underlying file.
     fn metadata(&self) -> impl Future<Output = Result<Metadata>>;
@@ -169,6 +250,10 @@ pub trait File: AsRawFd + AsyncRead + AsyncWrite + AsyncSeek + Sized {
     /// If you only need to read the entire file contents, consider using [`RuntimeFs::read`] or
     /// [`RuntimeFs::read_to_string`] instead.
     fn open(path: impl AsRef<Path>) -> impl Future<Output = Result<Self>>;
+
+    fn open_concrete(path: &Path) -> impl Future<Output = Result<Self>> {
+        Self::open(path)
+    }
 
     /// Truncates or extends the underlying file, updating the size of this file to become `size`.
     ///
@@ -234,4 +319,11 @@ pub trait OpenOptions: Default {
         &self,
         path: impl AsRef<Path>,
     ) -> impl Future<Output = Result<impl File<OpenOptions = Self>>>;
+
+    fn open_concrete(
+        &self,
+        path: &Path,
+    ) -> impl Future<Output = Result<impl File<OpenOptions = Self>>> {
+        self.open(path)
+    }
 }

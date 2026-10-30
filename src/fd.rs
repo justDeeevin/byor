@@ -65,6 +65,7 @@ pub trait Fd: AsFd + Sized {
         &self,
         op: impl FnMut(&Self::Inner) -> Result<R>,
     ) -> impl Future<Output = Result<R>>;
+
     /// Same as [`read_with`](Fd::read_with), but with mutable access to the inner I/O handle.
     ///
     /// # Safety

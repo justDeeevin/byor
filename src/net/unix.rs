@@ -26,6 +26,10 @@ pub trait UnixStream: AsRawFd + AsyncRead + AsyncWrite + Sized
     /// Creates a Unix connection to the given path.
     fn connect(path: impl AsRef<Path>) -> impl Future<Output = Result<Self>>;
 
+    fn connect_concrete(path: &Path) -> impl Future<Output = Result<Self>> {
+        Self::connect(path)
+    }
+
     /// Creates a pair of connected Unix sockets.
     ///
     /// Data written to one socket will be readable by the other, and vice versa.
@@ -54,6 +58,10 @@ pub trait UnixListener:
     /// clean the path either before calling <code>bind</code> or before the program ends.</div>
     fn bind(path: impl AsRef<Path>) -> Result<Self>;
 
+    fn bind_concrete(path: &Path) -> Result<Self> {
+        Self::bind(path)
+    }
+
     /// Accepts a new incoming connection.
     fn accept(&self) -> impl Future<Output = Result<(Self::Stream, SocketAddr)>>;
 
@@ -74,6 +82,10 @@ pub trait UnixDatagram:
     /// clean the path either before calling <code>bind</code> or before the program ends.</div>
     fn bind(path: impl AsRef<Path>) -> Result<Self>;
 
+    fn bind_concrete(path: &Path) -> Result<Self> {
+        Self::bind(path)
+    }
+
     /// Creates an unnamed pair of connected sockets.
     ///
     /// Data written to one socket will be readable by the other, and vice versa.
@@ -88,6 +100,10 @@ pub trait UnixDatagram:
     /// address. Additionally, [`recv_from`](UnixDatagram::recv_from) will filter out messages
     /// from any other address.
     fn connect(&self, path: impl AsRef<Path>) -> Result<()>;
+
+    fn connect_concrete(&self, path: &Path) -> Result<()> {
+        self.connect(path)
+    }
 
     /// The local address to which this socket is bound.
     fn local_addr(&self) -> Result<SocketAddr>;
@@ -107,6 +123,10 @@ pub trait UnixDatagram:
 
     /// Sends data to the given address, returning the number of bytes sent.
     fn send_to(&self, buf: &[u8], path: impl AsRef<Path>) -> impl Future<Output = Result<usize>>;
+
+    fn send_to_concrete(&self, buf: &[u8], path: &Path) -> impl Future<Output = Result<usize>> {
+        self.send_to(buf, path)
+    }
 
     /// Shuts down the read half, write half, or both halves of this socket.
     fn shutdown(&self, how: Shutdown) -> Result<()>;

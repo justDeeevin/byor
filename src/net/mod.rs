@@ -32,6 +32,11 @@ impl ToSocketAddrs for &[SocketAddr] {
         SocketAddrsKind::Slice(self)
     }
 }
+impl ToSocketAddrs for Vec<SocketAddr> {
+    fn kind(&self) -> SocketAddrsKind<'_> {
+        SocketAddrsKind::Slice(self)
+    }
+}
 impl ToSocketAddrs for (&str, u16) {
     fn kind(&self) -> SocketAddrsKind<'_> {
         SocketAddrsKind::StrPort(self.0, self.1)
@@ -100,7 +105,11 @@ pub trait TcpStream: AsyncRead + AsyncWrite + AsRawFd + Sized
 {
     /// Opens a TCP connection to a remote host.
     fn connect(addr: impl ToSocketAddrs) -> impl Future<Output = Result<Self>>;
-    ///
+
+    fn connect_concrete(addr: Vec<SocketAddr>) -> impl Future<Output = Result<Self>> {
+        Self::connect(addr)
+    }
+
     /// Returns the local address to which this stream is bound.
     fn local_addr(&self) -> Result<SocketAddr>;
 
@@ -152,6 +161,10 @@ pub trait TcpListener:
     /// with [`local_addr`](TcpListener::local_addr).
     fn bind(addr: impl ToSocketAddrs) -> impl Future<Output = Result<Self>>;
 
+    fn bind_concrete(addr: Vec<SocketAddr>) -> impl Future<Output = Result<Self>> {
+        Self::bind(addr)
+    }
+
     /// Returns the local address to which this listener is bound.
     fn local_addr(&self) -> Result<SocketAddr>;
 
@@ -181,6 +194,10 @@ pub trait UdpSocket: AsFd + AsRawFd + TryFrom<std::net::UdpSocket, Error = std::
     /// with [`local_addr`](UdpSocket::local_addr).
     fn bind(addr: impl ToSocketAddrs) -> impl Future<Output = Result<Self>>;
 
+    fn bind_concrete(addr: Vec<SocketAddr>) -> impl Future<Output = Result<Self>> {
+        Self::bind(addr)
+    }
+
     /// Returns the value of the `SO_BROADCAST` option.
     ///
     /// For more information about this option, see [`set_broadcast`](UdpSocket::set_broadcast).
@@ -190,6 +207,10 @@ pub trait UdpSocket: AsFd + AsRawFd + TryFrom<std::net::UdpSocket, Error = std::
     /// to `addr` and limiting packets that are read with [`recv`](UdpSocket::recv) to those received
     /// from `addr`.
     fn connect(&self, addr: impl ToSocketAddrs) -> impl Future<Output = Result<()>>;
+
+    fn connect_concrete(&self, addr: Vec<SocketAddr>) -> impl Future<Output = Result<()>> {
+        self.connect(addr)
+    }
 
     /// Executes an operation of the `IP_ADD_MEMBERSHIP` type.
     ///
@@ -271,6 +292,14 @@ pub trait UdpSocket: AsFd + AsRawFd + TryFrom<std::net::UdpSocket, Error = std::
     ///
     /// Fails if the IP version of the local socket does not match that of `addr`.
     fn send_to(&self, buf: &[u8], addr: impl ToSocketAddrs) -> impl Future<Output = Result<usize>>;
+
+    fn send_to_concrete(
+        &self,
+        buf: &[u8],
+        addr: Vec<SocketAddr>,
+    ) -> impl Future<Output = Result<usize>> {
+        self.send_to(buf, addr)
+    }
 
     /// Sets the value of the `SO_BROADCAST` option.
     ///
