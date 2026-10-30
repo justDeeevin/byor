@@ -11,7 +11,7 @@ mod channel;
 mod fs;
 
 #[cfg(all(feature = "fd", unix))]
-mod fd;
+pub mod fd;
 
 #[cfg(feature = "time")]
 mod time;

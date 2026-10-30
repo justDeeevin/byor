@@ -2,7 +2,7 @@
 mod smol;
 
 #[cfg(feature = "tokio")]
-mod tokio;
+pub mod tokio;
 
 #[cfg(feature = "futures")]
 mod futures;

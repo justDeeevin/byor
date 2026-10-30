@@ -14,6 +14,8 @@ impl<T: AsFd> std::os::fd::AsRawFd for AsRaw<T> {
     }
 }
 
+/// Wrapper around [`tokio::io::unix::AsyncFd`] that allows providing a type that only implements
+/// [`AsFd`]
 pub struct TokioFd<T: AsFd>(AsyncFd<AsRaw<T>>);
 
 impl<T: AsFd> AsFd for TokioFd<T> {
