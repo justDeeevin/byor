@@ -19,9 +19,9 @@ categories = [
 [dependencies]
 futures-core = { version = "0.3.34", optional = true }
 futures-io = { version = "0.3.34", optional = true }
-futures-util = { version = "0.3.34", optional = true }
+futures-util = "0.3.34"
 
-tokio = { version = "1.53.3", optional = true, features = [
+tokio = { version = "1.54.1", optional = true, features = [
   "sync",
   "rt-multi-thread",
   "rt",
@@ -52,7 +52,7 @@ smol = { version = "2.0.2", optional = true }
 default = ["full"]
 
 smol = ["dep:smol"]
-tokio = ["dep:tokio", "dep:tokio-stream", "dep:tokio-util", "dep:futures-util"]
+tokio = ["dep:tokio", "dep:tokio-stream", "dep:tokio-util"]
 futures = ["dep:futures"]
 
 full = ["lock", "channel", "exec", "fs", "fd", "time", "net", "process"]

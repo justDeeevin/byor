@@ -3,7 +3,7 @@
 #[cfg(feature = "tokio")]
 /// [`tokio`]
 pub struct Tokio;
-#[cfg(feature = "tokio")]
+#[cfg(all(feature = "tokio", feature = "fd"))]
 pub use crate::implement::tokio::fd::TokioFd;
 
 #[cfg(feature = "smol")]
