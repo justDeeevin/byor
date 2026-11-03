@@ -1,6 +1,7 @@
 use crate::{channel::mpsc::*, runtime::Futures};
 
-impl<T: 'static> Sender<T> for futures::channel::mpsc::Sender<T> {
+impl<T: 'static> Sender for futures::channel::mpsc::Sender<T> {
+    type Item = T;
     type SendError = futures::channel::mpsc::SendError;
 
     fn is_closed(&self) -> bool {
@@ -8,7 +9,7 @@ impl<T: 'static> Sender<T> for futures::channel::mpsc::Sender<T> {
     }
 }
 
-impl<T: 'static> SenderExt<T> for futures::channel::mpsc::Sender<T> {
+impl<T: 'static> SenderExt for futures::channel::mpsc::Sender<T> {
     async fn closed(&mut self) {
         while std::future::poll_fn(|cx| self.poll_ready(cx)).await.is_ok() {}
     }
@@ -18,7 +19,7 @@ impl<T: 'static> SenderExt<T> for futures::channel::mpsc::Sender<T> {
     }
 }
 
-impl<T: 'static> BoundedSender<T> for futures::channel::mpsc::Sender<T> {
+impl<T: 'static> BoundedSender for futures::channel::mpsc::Sender<T> {
     type TrySendError = futures::channel::mpsc::TrySendError<T>;
 
     fn send(&mut self, message: T) -> impl Future<Output = Result<(), Self::SendError>> {
@@ -30,7 +31,7 @@ impl<T: 'static> BoundedSender<T> for futures::channel::mpsc::Sender<T> {
     }
 }
 
-impl<T: 'static> Receiver<T> for futures::channel::mpsc::Receiver<T> {
+impl<T> Receiver for futures::channel::mpsc::Receiver<T> {
     type TryRecvError = futures::channel::mpsc::TryRecvError;
 
     fn close(&mut self) {
@@ -42,7 +43,8 @@ impl<T: 'static> Receiver<T> for futures::channel::mpsc::Receiver<T> {
     }
 }
 
-impl<T: 'static> Sender<T> for futures::channel::mpsc::UnboundedSender<T> {
+impl<T: 'static> Sender for futures::channel::mpsc::UnboundedSender<T> {
+    type Item = T;
     type SendError = futures::channel::mpsc::TrySendError<T>;
 
     fn is_closed(&self) -> bool {
@@ -50,7 +52,7 @@ impl<T: 'static> Sender<T> for futures::channel::mpsc::UnboundedSender<T> {
     }
 }
 
-impl<T: 'static> SenderExt<T> for futures::channel::mpsc::UnboundedSender<T> {
+impl<T: 'static> SenderExt for futures::channel::mpsc::UnboundedSender<T> {
     async fn closed(&mut self) {
         while std::future::poll_fn(|cx| self.poll_ready(cx)).await.is_ok() {}
     }
@@ -60,13 +62,13 @@ impl<T: 'static> SenderExt<T> for futures::channel::mpsc::UnboundedSender<T> {
     }
 }
 
-impl<T: 'static> UnboundedSender<T> for futures::channel::mpsc::UnboundedSender<T> {
+impl<T: 'static> UnboundedSender for futures::channel::mpsc::UnboundedSender<T> {
     fn send(&self, message: T) -> Result<(), Self::SendError> {
         self.unbounded_send(message)
     }
 }
 
-impl<T: 'static> Receiver<T> for futures::channel::mpsc::UnboundedReceiver<T> {
+impl<T> Receiver for futures::channel::mpsc::UnboundedReceiver<T> {
     type TryRecvError = futures::channel::mpsc::TryRecvError;
 
     fn close(&mut self) {
@@ -80,7 +82,7 @@ impl<T: 'static> Receiver<T> for futures::channel::mpsc::UnboundedReceiver<T> {
 
 impl RuntimeMpsc for Futures {
     type BoundedSender<T: 'static> = futures::channel::mpsc::Sender<T>;
-    type BoundedReceiver<T: 'static> = futures::channel::mpsc::Receiver<T>;
+    type BoundedReceiver<T> = futures::channel::mpsc::Receiver<T>;
 
     fn bounded_channel<T: 'static>(
         buffer: usize,
@@ -89,7 +91,7 @@ impl RuntimeMpsc for Futures {
     }
 
     type UnboundedSender<T: 'static> = futures::channel::mpsc::UnboundedSender<T>;
-    type UnboundedReceiver<T: 'static> = futures::channel::mpsc::UnboundedReceiver<T>;
+    type UnboundedReceiver<T> = futures::channel::mpsc::UnboundedReceiver<T>;
 
     fn unbounded_channel<T: 'static>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>) {
         futures::channel::mpsc::unbounded()

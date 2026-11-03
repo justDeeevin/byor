@@ -3,7 +3,8 @@ use crate::{
     runtime::Futures,
 };
 
-impl<T: ?Sized> Mutex<T> for futures::lock::Mutex<T> {
+impl<T: ?Sized> Mutex for futures::lock::Mutex<T> {
+    type Item = T;
     type Guard<'a>
         = futures::lock::MutexGuard<'a, T>
     where

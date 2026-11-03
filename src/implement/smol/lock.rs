@@ -18,7 +18,8 @@ impl BarrierWaitResult for smol::lock::BarrierWaitResult {
     }
 }
 
-impl<T: ?Sized> Mutex<T> for smol::lock::Mutex<T> {
+impl<T: ?Sized> Mutex for smol::lock::Mutex<T> {
+    type Item = T;
     type Guard<'a>
         = smol::lock::MutexGuard<'a, T>
     where
@@ -51,19 +52,20 @@ impl<T: ?Sized> Mutex<T> for smol::lock::Mutex<T> {
     }
 }
 
-impl<'a, T: ?Sized + 'a> MutexExt<'a, T> for smol::lock::Mutex<T> {
+impl<T: ?Sized> MutexExt for smol::lock::Mutex<T> {
     fn blocking_lock(&self) -> Self::Guard<'_> {
         self.lock_blocking()
     }
 }
 
-impl<'a, T: ?Sized> MutexGuard<'a, T> for smol::lock::MutexGuard<'a, T> {
-    fn source(this: &Self) -> &'a (impl Mutex<T, Guard<'a> = Self> + ?Sized + 'a) {
+impl<'a, T: ?Sized> MutexGuard<'a> for smol::lock::MutexGuard<'a, T> {
+    fn source(this: &Self) -> &(impl Mutex<Item = T, Guard<'a> = Self> + ?Sized + 'a) {
         Self::source(this)
     }
 }
 
-impl<T: ?Sized> RwLock<T> for smol::lock::RwLock<T> {
+impl<T: ?Sized> RwLock for smol::lock::RwLock<T> {
+    type Item = T;
     type ReadGuard<'a>
         = smol::lock::RwLockReadGuard<'a, T>
     where
@@ -116,11 +118,11 @@ impl<T: ?Sized> RwLock<T> for smol::lock::RwLock<T> {
     }
 }
 
-impl<T: ?Sized> RwLockReadGuard<T> for smol::lock::RwLockReadGuard<'_, T> {}
+impl<T: ?Sized> RwLockReadGuard for smol::lock::RwLockReadGuard<'_, T> {}
 
-impl<T: ?Sized> RwLockReadGuard<T> for smol::lock::RwLockWriteGuard<'_, T> {}
-impl<T: ?Sized> RwLockWriteGuard<T> for smol::lock::RwLockWriteGuard<'_, T> {
-    fn downgrade(self) -> impl RwLockReadGuard<T> {
+impl<T: ?Sized> RwLockReadGuard for smol::lock::RwLockWriteGuard<'_, T> {}
+impl<T: ?Sized> RwLockWriteGuard for smol::lock::RwLockWriteGuard<'_, T> {
+    fn downgrade(self) -> impl RwLockReadGuard<Target = Self::Target> {
         Self::downgrade(self)
     }
 }

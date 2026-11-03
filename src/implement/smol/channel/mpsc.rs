@@ -1,7 +1,8 @@
 use crate::{channel::mpsc::*, runtime::Smol};
 use smol::channel::{Receiver as SmolReceiver, Sender as SmolSender};
 
-impl<T: 'static> Sender<T> for smol::channel::Sender<T> {
+impl<T: 'static> Sender for smol::channel::Sender<T> {
+    type Item = T;
     type SendError = smol::channel::SendError<T>;
 
     fn is_closed(&self) -> bool {
@@ -9,7 +10,7 @@ impl<T: 'static> Sender<T> for smol::channel::Sender<T> {
     }
 }
 
-impl<T: 'static> BoundedSender<T> for SmolSender<T> {
+impl<T: 'static> BoundedSender for SmolSender<T> {
     type TrySendError = smol::channel::TrySendError<T>;
 
     fn send(&mut self, message: T) -> impl Future<Output = Result<(), Self::SendError>> {
@@ -21,7 +22,7 @@ impl<T: 'static> BoundedSender<T> for SmolSender<T> {
     }
 }
 
-impl<T: 'static> Receiver<T> for smol::channel::Receiver<T> {
+impl<T> Receiver for smol::channel::Receiver<T> {
     type TryRecvError = smol::channel::TryRecvError;
 
     fn close(&mut self) {
@@ -37,7 +38,7 @@ impl<T: 'static> Receiver<T> for smol::channel::Receiver<T> {
     }
 }
 
-impl<T: 'static> UnboundedSender<T> for SmolSender<T> {
+impl<T: 'static> UnboundedSender for SmolSender<T> {
     fn send(&self, message: T) -> Result<(), Self::SendError> {
         self.force_send(message).map(|_| ())
     }
@@ -45,7 +46,7 @@ impl<T: 'static> UnboundedSender<T> for SmolSender<T> {
 
 impl RuntimeMpsc for Smol {
     type BoundedSender<T: 'static> = smol::channel::Sender<T>;
-    type BoundedReceiver<T: 'static> = smol::channel::Receiver<T>;
+    type BoundedReceiver<T> = smol::channel::Receiver<T>;
 
     fn bounded_channel<T: 'static>(
         buffer: usize,
@@ -54,7 +55,7 @@ impl RuntimeMpsc for Smol {
     }
 
     type UnboundedSender<T: 'static> = smol::channel::Sender<T>;
-    type UnboundedReceiver<T: 'static> = smol::channel::Receiver<T>;
+    type UnboundedReceiver<T> = smol::channel::Receiver<T>;
 
     fn unbounded_channel<T: 'static>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>) {
         smol::channel::unbounded()

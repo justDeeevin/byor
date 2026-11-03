@@ -1,7 +1,8 @@
 use crate::{channel::mpsc::*, runtime::Tokio};
 use tokio::sync::mpsc::{Sender as TokioSender, UnboundedSender as TokioUnboundedSender};
 
-impl<T: 'static> Sender<T> for TokioSender<T> {
+impl<T: 'static> Sender for TokioSender<T> {
+    type Item = T;
     type SendError = tokio::sync::mpsc::error::SendError<T>;
 
     fn is_closed(&self) -> bool {
@@ -9,7 +10,7 @@ impl<T: 'static> Sender<T> for TokioSender<T> {
     }
 }
 
-impl<T: 'static> SenderExt<T> for TokioSender<T> {
+impl<T: 'static> SenderExt for TokioSender<T> {
     fn closed(&mut self) -> impl Future<Output = ()> {
         TokioSender::closed(self)
     }
@@ -19,7 +20,7 @@ impl<T: 'static> SenderExt<T> for TokioSender<T> {
     }
 }
 
-impl<T: 'static> BoundedSender<T> for TokioSender<T> {
+impl<T: 'static> BoundedSender for TokioSender<T> {
     type TrySendError = tokio::sync::mpsc::error::TrySendError<T>;
 
     fn send(&mut self, message: T) -> impl Future<Output = Result<(), Self::SendError>> {
@@ -31,7 +32,7 @@ impl<T: 'static> BoundedSender<T> for TokioSender<T> {
     }
 }
 
-impl<T: 'static> Receiver<T> for tokio_stream::wrappers::ReceiverStream<T> {
+impl<T> Receiver for tokio_stream::wrappers::ReceiverStream<T> {
     type TryRecvError = tokio::sync::mpsc::error::TryRecvError;
 
     fn close(&mut self) {
@@ -47,15 +48,16 @@ impl<T: 'static> Receiver<T> for tokio_stream::wrappers::ReceiverStream<T> {
     }
 }
 
-impl<T: 'static> Sender<T> for TokioUnboundedSender<T> {
-    type SendError = <TokioSender<T> as Sender<T>>::SendError;
+impl<T: 'static> Sender for TokioUnboundedSender<T> {
+    type Item = T;
+    type SendError = <TokioSender<T> as Sender>::SendError;
 
     fn is_closed(&self) -> bool {
         self.is_closed()
     }
 }
 
-impl<T: 'static> SenderExt<T> for TokioUnboundedSender<T> {
+impl<T: 'static> SenderExt for TokioUnboundedSender<T> {
     fn closed(&mut self) -> impl Future<Output = ()> {
         TokioUnboundedSender::closed(self)
     }
@@ -65,13 +67,13 @@ impl<T: 'static> SenderExt<T> for TokioUnboundedSender<T> {
     }
 }
 
-impl<T: 'static> UnboundedSender<T> for TokioUnboundedSender<T> {
+impl<T: 'static> UnboundedSender for TokioUnboundedSender<T> {
     fn send(&self, message: T) -> Result<(), Self::SendError> {
         self.send(message)
     }
 }
 
-impl<T: 'static> Receiver<T> for tokio_stream::wrappers::UnboundedReceiverStream<T> {
+impl<T> Receiver for tokio_stream::wrappers::UnboundedReceiverStream<T> {
     type TryRecvError = tokio::sync::mpsc::error::TryRecvError;
 
     fn close(&mut self) {
@@ -89,7 +91,7 @@ impl<T: 'static> Receiver<T> for tokio_stream::wrappers::UnboundedReceiverStream
 
 impl RuntimeMpsc for Tokio {
     type BoundedSender<T: 'static> = tokio::sync::mpsc::Sender<T>;
-    type BoundedReceiver<T: 'static> = tokio_stream::wrappers::ReceiverStream<T>;
+    type BoundedReceiver<T> = tokio_stream::wrappers::ReceiverStream<T>;
 
     fn bounded_channel<T: 'static>(
         buffer: usize,
@@ -100,7 +102,7 @@ impl RuntimeMpsc for Tokio {
     }
 
     type UnboundedSender<T: 'static> = tokio::sync::mpsc::UnboundedSender<T>;
-    type UnboundedReceiver<T: 'static> = tokio_stream::wrappers::UnboundedReceiverStream<T>;
+    type UnboundedReceiver<T> = tokio_stream::wrappers::UnboundedReceiverStream<T>;
 
     fn unbounded_channel<T: 'static>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>) {
         let (tx, rx) = tokio::sync::mpsc::unbounded_channel();

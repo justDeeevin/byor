@@ -10,16 +10,17 @@
 use std::ops::{Deref, DerefMut};
 
 /// An asynchronous mutex similar to [`std::sync::Mutex`].
-pub trait Mutex<T: ?Sized> {
+pub trait Mutex {
+    type Item: ?Sized;
     /// An RAII guard that unlocks the mutex when dropped.
     type Guard<'a>
     where
         Self: 'a;
 
     /// Creates a new lock in an unlocked state ready for use.
-    fn new(t: T) -> Self
+    fn new(t: Self::Item) -> Self
     where
-        T: Sized;
+        Self::Item: Sized;
 
     /// Locks this mutex, causing the current task to yield until the lock has been acquired.
     fn lock(&self) -> impl Future<Output = Self::Guard<'_>>;
@@ -30,27 +31,23 @@ pub trait Mutex<T: ?Sized> {
     /// Returns a mutable reference to the underlying data.
     ///
     /// Since this call borrows the `Mutex` mutably, no actual locking needs to take place—the mutable borrow statically guarantees no locks exist.
-    fn get_mut(&mut self) -> &mut T;
+    fn get_mut(&mut self) -> &mut Self::Item;
 
     /// Consumes the `Mutex`, returning the underlying data.
-    fn into_inner(self) -> T
+    fn into_inner(self) -> Self::Item
     where
-        T: Sized;
+        Self::Item: Sized;
 }
 
 /// A guard that unlocks its associated [`Mutex`] when dropped.
-pub trait MutexGuard<'a, T: ?Sized>: Deref<Target = T> + DerefMut {
+pub trait MutexGuard<'a>: Deref + DerefMut {
     /// Returns a reference to the `Mutex` from which this guard was acquired.
-    fn source(this: &Self) -> &'a (impl Mutex<T, Guard<'a> = Self> + ?Sized + 'a);
+    fn source(this: &Self) -> &(impl Mutex<Item = Self::Target, Guard<'a> = Self> + ?Sized + 'a);
 }
 
 /// More extensive behavior for [`Mutex`] implemented by tokio and smol (that is, only _not_
 /// implemented by futures).
-pub trait MutexExt<'a, T: ?Sized>: Mutex<T>
-where
-    <Self as Mutex<T>>::Guard<'a>: MutexGuard<'a, T>,
-    Self: 'a,
-{
+pub trait MutexExt: Mutex {
     /// Locks this mutex, **blocking the current thread** until it can be acquired.
     ///
     /// This method should not be used in an asynchronous context. It is intended to facilitate
@@ -64,20 +61,21 @@ where
 }
 
 /// An asynchronous reader-writer lock similar to [`std::sync::RwLock`].
-pub trait RwLock<T: ?Sized> {
+pub trait RwLock {
+    type Item: ?Sized;
     /// A read-only RAII guard that releases its read lock when dropped.
-    type ReadGuard<'a>: RwLockReadGuard<T>
+    type ReadGuard<'a>: RwLockReadGuard<Target = Self::Item>
     where
         Self: 'a;
     /// A read-write RAII guard that releases its write lock when dropped.
-    type WriteGuard<'a>: RwLockWriteGuard<T>
+    type WriteGuard<'a>: RwLockWriteGuard<Target = Self::Item>
     where
         Self: 'a;
 
     /// Creates a new lock in an unlocked state ready for use.
-    fn new(t: T) -> Self
+    fn new(t: Self::Item) -> Self
     where
-        T: Sized;
+        Self::Item: Sized;
 
     /// Locks this `RwLock` with shared read access, causing the current task to yield until
     /// the lock as been acquired.
@@ -122,21 +120,21 @@ pub trait RwLock<T: ?Sized> {
     ///
     /// Since this call borrows the `RwLock` mutably, no actual locking needs to take place—the
     /// mutable borrow statically guarantees no locks exist.
-    fn get_mut(&mut self) -> &mut T;
+    fn get_mut(&mut self) -> &mut Self::Item;
 
     /// Consumes the `RwLock`, returning the underlying data.
-    fn into_inner(self) -> T
+    fn into_inner(self) -> Self::Item
     where
-        T: Sized;
+        Self::Item: Sized;
 }
 
 /// A shared read guard that unlocks its associated [`RwLock`] when dropped.
-pub trait RwLockReadGuard<T: ?Sized>: Deref<Target = T> {}
+pub trait RwLockReadGuard: Deref {}
 
 /// An exclusive write guard that unlocks its associated [`RwLock`] when dropped.
-pub trait RwLockWriteGuard<T: ?Sized>: RwLockReadGuard<T> + DerefMut {
+pub trait RwLockWriteGuard: RwLockReadGuard + DerefMut {
     /// Downgrades into a read lock.
-    fn downgrade(self) -> impl RwLockReadGuard<T>;
+    fn downgrade(self) -> impl RwLockReadGuard<Target = Self::Target>;
 }
 
 /// A counter to synchrononize multiple tasks at the same time.
@@ -205,12 +203,12 @@ pub trait SemaphorePermit {
 
 /// A runtime with a Mutex implementation.
 pub trait RuntimeLock {
-    type Mutex<T: ?Sized>: Mutex<T> + ?Sized;
+    type Mutex<T: ?Sized>: Mutex<Item = T> + ?Sized;
 }
 
 /// A runtime with more locks.
 pub trait RuntimeLockExt: RuntimeLock {
-    type RwLock<T: ?Sized>: RwLock<T> + ?Sized;
+    type RwLock<T: ?Sized>: RwLock<Item = T> + ?Sized;
     type Barrier: Barrier;
     type Semaphore: Semaphore;
 }

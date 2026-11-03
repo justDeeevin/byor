@@ -5,11 +5,13 @@ use std::{
     task::{Context, Poll},
 };
 
-pub trait Sender<T> {
+pub trait Sender {
+    type Item;
+
     /// Attempts to send a value on this channel, returning it back if it could not be sent.
     ///
     /// This method consumes self as only one value may ever be sent on a oneshot channel.
-    fn send(self, t: T) -> Result<(), T>;
+    fn send(self, t: Self::Item) -> Result<(), Self::Item>;
 
     /// Waits for the associated [`Receiver`] handle to close.
     ///
@@ -30,7 +32,8 @@ pub trait Sender<T> {
 }
 
 /// Await a oneshot receiver to yield a value.
-pub trait Receiver<T>: Future<Output = Result<T, Self::RecvError>> {
+pub trait Receiver: Future<Output = Result<Self::Item, Self::RecvError>> {
+    type Item;
     type TryRecvError: Error;
     type RecvError: Error;
 
@@ -41,13 +44,13 @@ pub trait Receiver<T>: Future<Output = Result<T, Self::RecvError>> {
     ///
     /// Returns `Ok(Some(T))` if a value was received, `Ok(None)` if the channel is empty, and
     /// `Err` if the channel is closed.
-    fn try_recv(&mut self) -> Result<Option<T>, Self::TryRecvError>;
+    fn try_recv(&mut self) -> Result<Option<Self::Item>, Self::TryRecvError>;
 }
 
 /// A runtime with a oneshot channel.
 pub trait RuntimeOneshot {
-    type OneshotSender<T>: Sender<T>;
-    type OneshotReceiver<T>: Receiver<T>;
+    type OneshotSender<T>: Sender<Item = T>;
+    type OneshotReceiver<T>: Receiver<Item = T>;
 
     fn channel<T>() -> (Self::OneshotSender<T>, Self::OneshotReceiver<T>);
 }

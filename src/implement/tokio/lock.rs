@@ -18,7 +18,8 @@ impl BarrierWaitResult for tokio::sync::BarrierWaitResult {
     }
 }
 
-impl<T: ?Sized> Mutex<T> for tokio::sync::Mutex<T> {
+impl<T: ?Sized> Mutex for tokio::sync::Mutex<T> {
+    type Item = T;
     type Guard<'a>
         = tokio::sync::MutexGuard<'a, T>
     where
@@ -51,19 +52,20 @@ impl<T: ?Sized> Mutex<T> for tokio::sync::Mutex<T> {
     }
 }
 
-impl<'a, T: ?Sized + 'a> MutexExt<'a, T> for tokio::sync::Mutex<T> {
+impl<T: ?Sized> MutexExt for tokio::sync::Mutex<T> {
     fn blocking_lock(&self) -> Self::Guard<'_> {
         self.blocking_lock()
     }
 }
 
-impl<'a, T: ?Sized> MutexGuard<'a, T> for tokio::sync::MutexGuard<'a, T> {
-    fn source(this: &Self) -> &'a (impl Mutex<T, Guard<'a> = Self> + ?Sized + 'a) {
+impl<'a, T: ?Sized> MutexGuard<'a> for tokio::sync::MutexGuard<'a, T> {
+    fn source(this: &Self) -> &(impl Mutex<Item = T, Guard<'a> = Self> + ?Sized + 'a) {
         Self::mutex(this)
     }
 }
 
-impl<T: ?Sized> RwLock<T> for tokio::sync::RwLock<T> {
+impl<T: ?Sized> RwLock for tokio::sync::RwLock<T> {
+    type Item = T;
     type ReadGuard<'a>
         = tokio::sync::RwLockReadGuard<'a, T>
     where
@@ -116,11 +118,11 @@ impl<T: ?Sized> RwLock<T> for tokio::sync::RwLock<T> {
     }
 }
 
-impl<T: ?Sized> RwLockReadGuard<T> for tokio::sync::RwLockReadGuard<'_, T> {}
+impl<T: ?Sized> RwLockReadGuard for tokio::sync::RwLockReadGuard<'_, T> {}
 
-impl<T: ?Sized> RwLockReadGuard<T> for tokio::sync::RwLockWriteGuard<'_, T> {}
-impl<T: ?Sized> RwLockWriteGuard<T> for tokio::sync::RwLockWriteGuard<'_, T> {
-    fn downgrade(self) -> impl RwLockReadGuard<T> {
+impl<T: ?Sized> RwLockReadGuard for tokio::sync::RwLockWriteGuard<'_, T> {}
+impl<T: ?Sized> RwLockWriteGuard for tokio::sync::RwLockWriteGuard<'_, T> {
+    fn downgrade(self) -> impl RwLockReadGuard<Target = Self::Target> {
         self.downgrade()
     }
 }

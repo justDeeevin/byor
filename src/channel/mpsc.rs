@@ -4,7 +4,8 @@ use futures_core::Stream;
 use std::error::Error;
 
 /// Base sender behavior for both unbounded and bounded channels.
-pub trait Sender<T: 'static>: Clone {
+pub trait Sender: Clone {
+    type Item: 'static;
     type SendError: Error;
 
     /// Returns whether the channel is closed.
@@ -13,7 +14,7 @@ pub trait Sender<T: 'static>: Clone {
 
 /// More extensive behavior for `Sender` implemented by tokio and futures (that is, only _not_
 /// implemented by smol).
-pub trait SenderExt<T: 'static>: Sender<T> {
+pub trait SenderExt: Sender {
     /// Completes when the receiver has closed.
     fn closed(&mut self) -> impl Future<Output = ()>;
 
@@ -22,20 +23,20 @@ pub trait SenderExt<T: 'static>: Sender<T> {
 }
 
 /// A sender to a channel with a maximum capacity.
-pub trait BoundedSender<T: 'static>: Sender<T> {
+pub trait BoundedSender: Sender {
     type TrySendError: Error;
 
     /// Sends message, waiting until there is capacity.
     ///
     /// Returns `Err` with the given value if the channel is closed.
-    fn send(&mut self, message: T) -> impl Future<Output = Result<(), Self::SendError>>;
+    fn send(&mut self, message: Self::Item) -> impl Future<Output = Result<(), Self::SendError>>;
 
     /// Attempts to immediately send a message on the channel.
-    fn try_send(&mut self, message: T) -> Result<(), Self::TrySendError>;
+    fn try_send(&mut self, message: Self::Item) -> Result<(), Self::TrySendError>;
 }
 
 /// Receiver behavior for both unbounded and bounded channels.
-pub trait Receiver<T: 'static>: Stream<Item = T> {
+pub trait Receiver: Stream {
     type TryRecvError: Error;
 
     /// Closes the channel, preventing any further messages from being sent.
@@ -48,31 +49,31 @@ pub trait Receiver<T: 'static>: Stream<Item = T> {
     ///
     /// Returns `Ok(T)` if it can receive a message, `Ok(None)` if the channel is empty, and `Err`
     /// if the channel is closed.
-    fn try_recv(&mut self) -> Result<Option<T>, Self::TryRecvError>;
+    fn try_recv(&mut self) -> Result<Option<Self::Item>, Self::TryRecvError>;
 }
 
 /// A sender to a channel without a maximum capacity.
-pub trait UnboundedSender<T: 'static>: Sender<T> {
+pub trait UnboundedSender: Sender {
     /// Sends a message.
     ///
     /// Note that this is not marked as async—this method will never block because the channel will
     /// never be full.
     ///
     /// Returrns `Err` with the given value if the channel is closed.
-    fn send(&self, message: T) -> Result<(), Self::SendError>;
+    fn send(&self, message: Self::Item) -> Result<(), Self::SendError>;
 }
 
 /// A runtime with an MPSC channel.
 pub trait RuntimeMpsc {
-    type BoundedSender<T: 'static>: BoundedSender<T>;
-    type BoundedReceiver<T: 'static>: Receiver<T>;
+    type BoundedSender<T: 'static>: BoundedSender<Item = T>;
+    type BoundedReceiver<T>: Receiver<Item = T>;
 
     fn bounded_channel<T: 'static>(
         buffer: usize,
     ) -> (Self::BoundedSender<T>, Self::BoundedReceiver<T>);
 
-    type UnboundedSender<T: 'static>: UnboundedSender<T>;
-    type UnboundedReceiver<T: 'static>: Receiver<T>;
+    type UnboundedSender<T: 'static>: UnboundedSender<Item = T>;
+    type UnboundedReceiver<T>: Receiver<Item = T>;
 
     fn unbounded_channel<T: 'static>() -> (Self::UnboundedSender<T>, Self::UnboundedReceiver<T>);
 }
