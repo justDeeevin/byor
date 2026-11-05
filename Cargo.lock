@@ -157,6 +157,7 @@ name = "byor"
 version = "5.0.0"
 dependencies = [
  "futures",
+ "futures-channel",
  "futures-core",
  "futures-io",
  "futures-util",

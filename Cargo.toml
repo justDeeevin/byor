@@ -48,10 +48,13 @@ futures = { version = "0.3.34", default-features = false, optional = true, featu
 
 smol = { version = "2.0.2", optional = true }
 
+futures-channel = { version = "0.3.34", optional = true }
+
 [features]
 default = ["full"]
 
 smol = ["dep:smol"]
+smol-oneshot = ["dep:futures-channel"]
 tokio = ["dep:tokio", "dep:tokio-stream", "dep:tokio-util"]
 futures = ["dep:futures"]
 

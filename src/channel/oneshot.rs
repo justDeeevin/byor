@@ -1,4 +1,8 @@
 //! A channel used for sending a single message between asynchronous tasks.
+//!
+//! Smol does not provide a oneshot channel, so it does not implement [`RuntimeOneshot`]. However,
+//! an implementation using futures's oneshot is provided under the `smol-oneshot` feature if one is
+//! needed.
 
 use std::{
     error::Error,
